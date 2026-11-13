@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block titulo %}Crear cuenta · Gestor de Inventario{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta tarjeta-acceso">
+    <span class="marca-icono marca-icono-grande">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
+    </span>
+    <h1>Crear cuenta</h1>
+    <p class="texto-suave">Completá tus datos para empezar a usar el sistema.</p>
+
+    <form method="post" class="formulario">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" value="{{ nombre or '' }}" required autofocus>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ email or '' }}" required>
+
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" minlength="6" required>
+
+        <label for="confirmacion">Repetir contraseña</label>
+        <input type="password" id="confirmacion" name="confirmacion" minlength="6" required>
+
+        <button type="submit" class="boton boton-ancho">Crear cuenta</button>
+    </form>
+
+    <p class="texto-suave pie-acceso">¿Ya tenés cuenta? <a href="{{ url_for('auth.login') }}">Iniciá sesión</a></p>
+</div>
+{% endblock %}
