@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="arquitectura" name="Mapa de arquitectura">
+    <mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1450" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="titulo" value="Mapa de arquitectura - Gestor de Inventario" style="text;html=1;fontSize=22;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="600" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="usuario" value="Usuario" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="40" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="frontend" value="Frontend (navegador)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=#f5f5f5;strokeColor=#666666;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="150" y="160" width="250" height="260" as="geometry"/>
+        </mxCell>
+        <mxCell id="plantillas" value="&lt;b&gt;Plantillas Jinja2&lt;/b&gt;&lt;br&gt;templates/" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="175" y="215" width="200" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="css" value="&lt;b&gt;Estilos CSS&lt;/b&gt;&lt;br&gt;static/css/estilos.css" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="175" y="310" width="200" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="backend" value="Backend (Flask - app.py)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=#fff1e8;strokeColor=#ff6a13;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="490" y="110" width="400" height="360" as="geometry"/>
+        </mxCell>
+        <mxCell id="bp_auth" value="&lt;b&gt;auth.py&lt;/b&gt;&lt;br&gt;Login y registro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff6a13;" vertex="1" parent="1">
+          <mxGeometry x="510" y="160" width="170" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="bp_dashboard" value="&lt;b&gt;dashboard.py&lt;/b&gt;&lt;br&gt;Analíticas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff6a13;" vertex="1" parent="1">
+          <mxGeometry x="700" y="160" width="170" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="bp_inventario" value="&lt;b&gt;inventario.py&lt;/b&gt;&lt;br&gt;Productos y categorías" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff6a13;" vertex="1" parent="1">
+          <mxGeometry x="510" y="245" width="170" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="bp_proveedores" value="&lt;b&gt;proveedores.py&lt;/b&gt;&lt;br&gt;Proveedores" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff6a13;" vertex="1" parent="1">
+          <mxGeometry x="700" y="245" width="170" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="extensiones" value="&lt;b&gt;extensiones.py&lt;/b&gt;&lt;br&gt;Flask-Login (sesiones) + Flask-Bcrypt (contraseñas)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="510" y="335" width="360" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="config" value="&lt;b&gt;config.py&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="510" y="405" width="360" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="env" value="&lt;b&gt;Archivo .env&lt;/b&gt;&lt;br&gt;SECRET_KEY, DATABASE_URL&lt;br&gt;&lt;i&gt;(no se sube a GitHub)&lt;/i&gt;" style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#fff8db;strokeColor=#b59a3c;" vertex="1" parent="1">
+          <mxGeometry x="590" y="540" width="200" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="orm" value="&lt;b&gt;ORM Flask-SQLAlchemy&lt;/b&gt;&lt;br&gt;models.py&lt;br&gt;Usuario, Categoria,&lt;br&gt;Proveedor, Producto" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e7f1fb;strokeColor=#4a7fb5;" vertex="1" parent="1">
+          <mxGeometry x="980" y="235" width="200" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="bd" value="&lt;b&gt;SQLite&lt;/b&gt;&lt;br&gt;instance/inventario.db" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;size=12;fillColor=#e5f4e4;strokeColor=#3d8a4f;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="230" width="160" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_usuario" value="usa" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="usuario" target="frontend">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_front_back" value="Peticiones HTTP&lt;br&gt;(GET / POST)" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" edge="1" parent="1" source="frontend" target="backend">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_back_front" value="HTML generado&lt;br&gt;con Jinja2" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.65;entryX=1;entryY=0.65;dashed=1;" edge="1" parent="1" source="backend" target="frontend">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_back_orm" value="objetos Python" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="backend" target="orm">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_orm_bd" value="consultas SQL" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="orm" target="bd">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_env" value="lee la configuración" style="endArrow=classic;html=1;rounded=0;dashed=1;" edge="1" parent="1" source="env" target="backend">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="nota" value="Sin servicios externos: el sistema corre en un servidor Flask local y guarda todo en un único archivo SQLite." style="text;html=1;whiteSpace=wrap;fontSize=12;fontColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="700" height="30" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
