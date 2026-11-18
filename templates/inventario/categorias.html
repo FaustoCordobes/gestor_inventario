@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block titulo %}Categorías · Gestor de Inventario{% endblock %}
+
+{% block contenido %}
+<h1 class="titulo-pagina">Categorías</h1>
+
+<div class="tarjeta tarjeta-form">
+    <form method="post" class="fila-alta">
+        <input type="text" name="nombre" maxlength="60" value="{{ nombre }}" placeholder="Nombre de la nueva categoría" required>
+        <button type="submit" class="boton">Crear categoría</button>
+    </form>
+</div>
+
+<div class="tarjeta separada">
+    {% if categorias %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Productos</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in categorias %}
+                <tr>
+                    <td>{{ c.nombre }}</td>
+                    <td>
+                        {% if c.productos %}
+                            <a href="{{ url_for('inventario.lista', categoria=c.id) }}">{{ c.productos | length }}</a>
+                        {% else %}
+                            0
+                        {% endif %}
+                    </td>
+                    <td class="acciones">
+                        {% if c.productos %}
+                            <span class="texto-suave">No se puede eliminar: tiene productos</span>
+                        {% else %}
+                            <form method="post" action="{{ url_for('inventario.eliminar_categoria', categoria_id=c.id) }}"
+                                  onsubmit='return confirm({{ ("¿Eliminar la categoría " ~ c.nombre ~ "?") | tojson }});'>
+                                <button type="submit" class="enlace-boton enlace-peligro">Eliminar</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="texto-suave">Todavía no hay categorías. Creá la primera arriba.</p>
+    {% endif %}
+</div>
+{% endblock %}
