@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+
+<div class="metrics">
+    <div class="card metric">
+        <span class="text-muted">Productos</span>
+        <strong>{{ total_products }}</strong>
+    </div>
+    <div class="card metric">
+        <span class="text-muted">Stock bajo</span>
+        <strong>{{ low_stock_count }}</strong>
+    </div>
+    <div class="card metric">
+        <span class="text-muted">Valor del inventario (costo)</span>
+        <strong>${{ "%.2f"|format(inventory_value) }}</strong>
+    </div>
+    <div class="card metric">
+        <span class="text-muted">Proveedores activos</span>
+        <strong>{{ active_suppliers }}</strong>
+    </div>
+</div>
+
+<div class="card separated">
+    <h2>Valor del inventario por categoría</h2>
+    {% if chart_html %}
+        {{ chart_html | safe }}
+    {% else %}
+        <p class="text-muted">Todavía no hay productos cargados.</p>
+    {% endif %}
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h2>Principales proveedores</h2>
+        {% if top_suppliers %}
+            <table>
+                <thead>
+                    <tr><th>Proveedor</th><th>Productos</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    {% for row in top_suppliers %}
+                    <tr>
+                        <td><a href="{{ url_for('supplier.detail', supplier_id=row.supplier.id) }}">{{ row.supplier.name }} {{ row.supplier.last_name }}</a></td>
+                        <td>{{ row.products }}</td>
+                        <td>${{ "%.2f"|format(row.value) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">No hay proveedores cargados.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Productos destacados</h2>
+        {% if featured %}
+            <table>
+                <thead>
+                    <tr><th>Producto</th><th>Stock</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in featured %}
+                    <tr>
+                        <td><a href="{{ url_for('inventory.edit', product_id=p.id) }}">{{ p.name }}</a></td>
+                        <td>{{ p.stock }}</td>
+                        <td>${{ "%.2f"|format(p.cost * p.stock) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="text-muted">No hay productos cargados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card separated">
+    <h2>Productos con stock bajo</h2>
+    {% if low_stock %}
+        <table>
+            <thead>
+                <tr><th>Código</th><th>Producto</th><th>Stock</th><th>Mínimo</th></tr>
+            </thead>
+            <tbody>
+                {% for p in low_stock %}
+                <tr>
+                    <td>{{ p.code }}</td>
+                    <td><a href="{{ url_for('inventory.edit', product_id=p.id) }}">{{ p.name }}</a></td>
+                    <td><span class="tag tag-red">{{ p.stock }}</span></td>
+                    <td>{{ p.min_stock }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">No hay productos con stock bajo.</p>
+    {% endif %}
+</div>
+{% endblock %}

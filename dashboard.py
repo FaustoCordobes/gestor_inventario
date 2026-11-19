@@ -25,7 +25,7 @@ def _category_chart():
     fig = go.Figure(go.Bar(
         x=[name for name, _ in rows],
         y=[round(total or 0, 2) for _, total in rows],
-        marker_color="#3b82f6",
+        marker_color="#1c1c1e",
     ))
     fig.update_layout(
         height=320,

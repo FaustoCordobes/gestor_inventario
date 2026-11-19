@@ -159,7 +159,7 @@ def _render_form(product, data):
         product=product,
         data=data,
         categories=Category.query.order_by(Category.name).all(),
-        suppliers=Supplier.query.filter_by(active=True).order_by(Supplier.name).all(),
+        suppliers=Supplier.query.filter_by(is_active=True).order_by(Supplier.name).all(),
     )
 
 

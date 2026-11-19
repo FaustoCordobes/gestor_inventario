@@ -513,6 +513,29 @@ th {
     margin-top: 12px;
 }
 
+.metrics,
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.metric strong {
+    font-size: 26px;
+}
+
+.dashboard-grid .card h2,
+.card.separated h2 {
+    margin-top: 0;
+}
+
 @media (max-width: 800px) {
     .row-double {
         grid-template-columns: 1fr;
