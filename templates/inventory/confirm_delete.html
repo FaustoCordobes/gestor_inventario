@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar producto · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Eliminar producto</h1>
+
+<div class="card card-form">
+    <p>¿Seguro que querés eliminar <strong>{{ product.name }}</strong> (código {{ product.code }})?</p>
+    <p class="text-muted">Esta acción no se puede deshacer.</p>
+
+    <form method="post" class="form-buttons">
+        <button type="submit" class="button button-danger">Sí, eliminar</button>
+        <a class="button button-light" href="{{ url_for('inventory.index') }}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

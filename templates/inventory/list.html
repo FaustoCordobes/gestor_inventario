@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Inventario</h1>
+    <a class="button" href="{{ url_for('inventory.new') }}">+ Agregar producto</a>
+</div>
+
+<form class="filters" method="get" action="{{ url_for('inventory.index') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Nombre o código">
+    <select name="category">
+        <option value="">Todas las categorías</option>
+        {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if c.id == category_id }}>{{ c.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="button">Filtrar</button>
+    {% if q or category_id %}
+        <a class="button button-light" href="{{ url_for('inventory.index') }}">Limpiar</a>
+    {% endif %}
+</form>
+
+<div class="card">
+    {% if products %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ p.code }}</td>
+                    <td>{{ p.name }}</td>
+                    <td>{{ p.category.name }}</td>
+                    <td>$ {{ '%.2f' | format(p.price) }}</td>
+                    <td>{{ p.stock }}</td>
+                    <td>
+                        {% if p.is_low_stock() %}
+                            <span class="tag tag-red">Stock bajo</span>
+                        {% else %}
+                            <span class="tag tag-green">Normal</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <a href="{{ url_for('inventory.edit', product_id=p.id) }}">Editar</a>
+                        <a class="link-danger" href="{{ url_for('inventory.delete', product_id=p.id) }}">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif q or category_id %}
+        <p class="text-muted">No hay productos que coincidan con la búsqueda.</p>
+    {% else %}
+        <p class="text-muted">Todavía no cargaste productos. Empezá con «Agregar producto».</p>
+    {% endif %}
+</div>
+{% endblock %}

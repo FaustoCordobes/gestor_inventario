@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block titulo %}Iniciar sesión · Gestor de Inventario{% endblock %}
+{% block title %}Iniciar sesión · Gestor de Inventario{% endblock %}
 
-{% block contenido %}
-<div class="tarjeta tarjeta-acceso">
-    <span class="marca-icono marca-icono-grande">
+{% block content %}
+<div class="card card-access">
+    <span class="brand-icon brand-icon-large">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
     </span>
     <h1>Iniciar sesión</h1>
-    <p class="texto-suave">Ingresá con tu email y contraseña.</p>
+    <p class="text-muted">Ingresá con tu email y contraseña.</p>
 
-    <form method="post" class="formulario">
+    <form method="post" class="form">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" value="{{ email or '' }}" required autofocus>
 
         <label for="password">Contraseña</label>
         <input type="password" id="password" name="password" required>
 
-        <button type="submit" class="boton boton-ancho">Entrar</button>
+        <button type="submit" class="button button-wide">Entrar</button>
     </form>
 
-    <p class="texto-suave pie-acceso">¿No tenés cuenta? <a href="{{ url_for('auth.registro') }}">Registrate</a></p>
+    <p class="text-muted access-footer">¿No tenés cuenta? <a href="{{ url_for('auth.register') }}">Registrate</a></p>
 </div>
 {% endblock %}

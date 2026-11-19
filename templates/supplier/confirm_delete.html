@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar proveedor · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Eliminar proveedor</h1>
+
+<div class="card card-form">
+    <p>¿Seguro que querés eliminar a <strong>{{ supplier.name }} {{ supplier.last_name }}</strong>?</p>
+    {% if supplier.products %}
+        <p class="text-muted">Tiene {{ supplier.products | length }} producto(s). Quedan sin proveedor, pero no se borran.</p>
+    {% endif %}
+    <p class="text-muted">Esta acción no se puede deshacer.</p>
+
+    <form method="post" class="form-buttons">
+        <button type="submit" class="button button-danger">Sí, eliminar</button>
+        <a class="button button-light" href="{{ url_for('supplier.detail', supplier_id=supplier.id) }}">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

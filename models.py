@@ -2,63 +2,65 @@ from datetime import datetime
 
 from flask_login import UserMixin
 
-from extensiones import db
+from extensions import db
 
 
-class Usuario(UserMixin, db.Model):
-    __tablename__ = "usuarios"
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
 
-class Categoria(db.Model):
-    __tablename__ = "categorias"
+class Category(db.Model):
+    __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(60), unique=True, nullable=False)
-    productos = db.relationship("Producto", back_populates="categoria")
+    name = db.Column(db.String(60), unique=True, nullable=False)
+    products = db.relationship("Product", back_populates="category")
 
 
-class Proveedor(db.Model):
-    __tablename__ = "proveedores"
+class Supplier(db.Model):
+    __tablename__ = "suppliers"
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), unique=True, nullable=False)
-    contacto = db.Column(db.String(80))
-    telefono = db.Column(db.String(30))
+    type_supplier = db.Column(db.String(150), nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    last_name = db.Column(db.String(100), unique=True, nullable=False)
+    phone = db.Column(db.String(30))
     email = db.Column(db.String(120))
-    direccion = db.Column(db.String(150))
-    activo = db.Column(db.Boolean, default=True)
-    productos = db.relationship("Producto", back_populates="proveedor")
+    description = db.Column(db.String(150))
+    address = db.Column(db.String(150), nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    products = db.relationship("Product", back_populates="supplier")
 
 
-class Producto(db.Model):
-    __tablename__ = "productos"
+class Product(db.Model):
+    __tablename__ = "products"
 
     id = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(20), unique=True, nullable=False)
-    nombre = db.Column(db.String(100), unique=True, nullable=False)
-    descripcion = db.Column(db.Text)
-    precio = db.Column(db.Float, nullable=False)
-    costo = db.Column(db.Float, nullable=False, default=0)
+    code = db.Column(db.String(20), unique=True, nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    price = db.Column(db.Float, nullable=False)
+    cost = db.Column(db.Float, nullable=False, default=0)
     stock = db.Column(db.Integer, nullable=False, default=0)
-    stock_minimo = db.Column(db.Integer, nullable=False, default=5)
-    fecha_alta = db.Column(db.DateTime, default=datetime.utcnow)
-    categoria_id = db.Column(db.Integer, db.ForeignKey("categorias.id"), nullable=False)
-    proveedor_id = db.Column(db.Integer, db.ForeignKey("proveedores.id"))
-    categoria = db.relationship("Categoria", back_populates="productos")
-    proveedor = db.relationship("Proveedor", back_populates="productos")
+    min_stock = db.Column(db.Integer, nullable=False, default=5)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
+    supplier_id = db.Column(db.Integer, db.ForeignKey("suppliers.id"))
+    category = db.relationship("Category", back_populates="products")
+    supplier = db.relationship("Supplier", back_populates="products")
 
-    def valor_stock(self):
-        return self.precio * self.stock
+    def stock_value(self):
+        return self.price * self.stock
 
-    def margen(self):
-        if self.precio == 0:
+    def margin(self):
+        if self.price == 0:
             return 0
-        return round((self.precio - self.costo) / self.precio * 100, 1)
+        return round((self.price - self.cost) / self.price * 100, 1)
 
-    def stock_bajo(self):
-        return self.stock <= self.stock_minimo
+    def is_low_stock(self):
+        return self.stock <= self.min_stock

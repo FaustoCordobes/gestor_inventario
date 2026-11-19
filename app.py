@@ -3,9 +3,9 @@ from flask import Flask, redirect, render_template, url_for
 from auth import auth_bp
 from config import Config
 from dashboard import dashboard_bp
-from extensiones import bcrypt, db, login_manager
-from inventario import inventario_bp
-from proveedores import proveedores_bp
+from extensions import bcrypt, db, login_manager
+from inventory import inventory_bp
+from supplier import supplier_bp
 
 
 def create_app(config_extra=None):
@@ -20,19 +20,19 @@ def create_app(config_extra=None):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
-    app.register_blueprint(inventario_bp)
-    app.register_blueprint(proveedores_bp)
+    app.register_blueprint(inventory_bp)
+    app.register_blueprint(supplier_bp)
 
     @app.route("/")
-    def inicio():
+    def home():
         return redirect(url_for("dashboard.index"))
 
     @app.errorhandler(404)
-    def no_encontrado(error):
+    def not_found(error):
         return render_template("404.html"), 404
 
     @app.errorhandler(500)
-    def error_servidor(error):
+    def server_error(error):
         return render_template("500.html"), 500
 
     with app.app_context():

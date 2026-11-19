@@ -65,14 +65,14 @@ Por ahora incluye los tests del login (`tests/test_auth.py`):
 ```
 app.py            aplicación principal y registro de blueprints
 config.py         configuración leída desde .env
-extensiones.py    base de datos, bcrypt y login
-models.py         Usuario, Categoria, Proveedor y Producto
+extensions.py     base de datos, bcrypt y login
+models.py         User, Category, Supplier y Product
 auth.py           blueprint de login
 dashboard.py      blueprint del dashboard
-inventario.py     blueprint de productos y categorías
-proveedores.py    blueprint de proveedores
+inventory.py      blueprint de productos y categorías
+suppliers.py      blueprint de proveedores
 templates/        plantillas HTML
-static/css/       estilos
+static/css/       estilos (styles.css)
 tests/            tests con pytest
 ```
 

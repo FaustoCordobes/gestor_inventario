@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block titulo %}Página no encontrada · Gestor de Inventario{% endblock %}
+{% block title %}Página no encontrada · Gestor de Inventario{% endblock %}
 
-{% block contenido %}
-<div class="tarjeta pagina-error">
-    <p class="codigo-error">404</p>
+{% block content %}
+<div class="card error-page">
+    <p class="error-code">404</p>
     <h1>No encontramos esta página</h1>
-    <p class="texto-suave">Puede que el enlace esté mal escrito o que el registro ya no exista.</p>
-    <a class="boton" href="{{ url_for('inicio') }}">Volver al inicio</a>
+    <p class="text-muted">Puede que el enlace esté mal escrito o que el registro ya no exista.</p>
+    <a class="button" href="{{ url_for('home') }}">Volver al inicio</a>
 </div>
 {% endblock %}

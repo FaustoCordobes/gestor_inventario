@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Proveedores</h1>
+    <a class="button" href="{{ url_for('supplier.new') }}">+ Agregar proveedor</a>
+</div>
+
+<form class="filters" method="get" action="{{ url_for('supplier.index') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Nombre del proveedor">
+    <button type="submit" class="button">Buscar</button>
+    {% if q %}
+        <a class="button button-light" href="{{ url_for('supplier.index') }}">Limpiar</a>
+    {% endif %}
+</form>
+
+<div class="card">
+    {% if suppliers %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Tipo</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in suppliers %}
+                <tr>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.last_name }}</td>
+                    <td>{{ s.type_supplier }}</td>
+                    <td>{{ s.phone or "-" }}</td>
+                    <td>{{ s.email or "-" }}</td>
+                    <td>
+                        {% if s.is_active %}
+                            <span class="tag tag-green">Activo</span>
+                        {% else %}
+                            <span class="tag tag-red">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <a href="{{ url_for('supplier.detail', supplier_id=s.id) }}">Ver</a>
+                        <a href="{{ url_for('supplier.edit', supplier_id=s.id) }}">Editar</a>
+                        <a class="link-danger" href="{{ url_for('supplier.delete', supplier_id=s.id) }}">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif q %}
+        <p class="text-muted">No hay proveedores que coincidan con la búsqueda.</p>
+    {% else %}
+        <p class="text-muted">Todavía no cargaste proveedores. Empezá con «Agregar proveedor».</p>
+    {% endif %}
+</div>
+{% endblock %}

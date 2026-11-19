@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar producto' if product else 'Nuevo producto' }} · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ 'Editar producto' if product else 'Nuevo producto' }}</h1>
+
+{% if not categories %}
+    <div class="card">
+        <p>Para cargar un producto necesitás al menos una categoría.</p>
+        <a class="button" href="{{ url_for('inventory.categories') }}">Crear una categoría</a>
+    </div>
+{% else %}
+<div class="card card-form">
+    <form method="post" class="form form-no-margin" novalidate>
+        <div class="row-double">
+            <div>
+                <label for="code">Código *</label>
+                <input type="text" id="code" name="code" maxlength="20" value="{{ data.code }}" required autofocus>
+            </div>
+            <div>
+                <label for="name">Nombre *</label>
+                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" required>
+            </div>
+        </div>
+
+        <label for="description">Descripción</label>
+        <textarea id="description" name="description" rows="3">{{ data.description }}</textarea>
+
+        <div class="row-double">
+            <div>
+                <label for="price">Precio de venta *</label>
+                <input type="number" id="price" name="price" min="0" step="0.01" value="{{ data.price }}" required>
+            </div>
+            <div>
+                <label for="cost">Costo</label>
+                <input type="number" id="cost" name="cost" min="0" step="0.01" value="{{ data.cost }}">
+            </div>
+        </div>
+
+        <div class="row-double">
+            <div>
+                <label for="stock">Stock actual *</label>
+                <input type="number" id="stock" name="stock" min="0" step="1" value="{{ data.stock }}" required>
+            </div>
+            <div>
+                <label for="min_stock">Stock mínimo</label>
+                <input type="number" id="min_stock" name="min_stock" min="0" step="1" value="{{ data.min_stock }}">
+            </div>
+        </div>
+
+        <div class="row-double">
+            <div>
+                <label for="category_id">Categoría *</label>
+                <select id="category_id" name="category_id" required>
+                    <option value="">Elegí una categoría</option>
+                    {% for c in categories %}
+                        <option value="{{ c.id }}" {{ 'selected' if data.category_id == c.id | string }}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="supplier_id">Proveedor</label>
+                <select id="supplier_id" name="supplier_id">
+                    <option value="">Sin proveedor</option>
+                    {% for s in suppliers %}
+                        <option value="{{ s.id }}" {{ 'selected' if data.supplier_id == s.id | string }}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <p class="text-muted form-note">Los campos con * son obligatorios.</p>
+
+        <div class="form-buttons">
+            <button type="submit" class="button">{{ 'Guardar cambios' if product else 'Crear producto' }}</button>
+            <a class="button button-light" href="{{ url_for('inventory.index') }}">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

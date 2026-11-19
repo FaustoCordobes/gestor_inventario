@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar proveedor' if supplier else 'Nuevo proveedor' }} · Gestor de Inventario{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ 'Editar proveedor' if supplier else 'Nuevo proveedor' }}</h1>
+
+<div class="card card-form">
+    <form method="post" class="form form-no-margin" novalidate>
+        <div class="row-double">
+            <div>
+                <label for="type_supplier">Tipo de proveedor *</label>
+                <input type="text" id="type_supplier" name="type_supplier" maxlength="150" value="{{ data.type_supplier }}" required autofocus>
+            </div>
+            <div>
+                <label for="is_active">Activo</label>
+                <input type="checkbox" id="is_active" name="is_active" {{ 'checked' if data.is_active }}>
+            </div>
+        </div>
+
+        <div class="row-double">
+            <div>
+                <label for="name">Nombre *</label>
+                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" required>
+            </div>
+            <div>
+                <label for="last_name">Apellido *</label>
+                <input type="text" id="last_name" name="last_name" maxlength="100" value="{{ data.last_name }}" required>
+            </div>
+        </div>
+
+        <div class="row-double">
+            <div>
+                <label for="phone">Teléfono</label>
+                <input type="text" id="phone" name="phone" maxlength="30" value="{{ data.phone }}">
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" maxlength="120" value="{{ data.email }}">
+            </div>
+        </div>
+
+        <label for="address">Dirección</label>
+        <input type="text" id="address" name="address" maxlength="150" value="{{ data.address }}">
+
+        <label for="description">Descripción</label>
+        <textarea id="description" name="description" rows="3" maxlength="150">{{ data.description }}</textarea>
+
+        <p class="text-muted form-note">Los campos con * son obligatorios.</p>
+
+        <div class="form-buttons">
+            <button type="submit" class="button">{{ 'Guardar cambios' if supplier else 'Crear proveedor' }}</button>
+            <a class="button button-light" href="{{ url_for('supplier.detail', supplier_id=supplier.id) if supplier else url_for('supplier.index') }}">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
