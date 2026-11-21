@@ -1,7 +1,7 @@
 import os
 
 from mcp_inventario.core import mcp
-from mcp_inventario.tools import products
+from mcp_inventario.tools import dashboard, products, suppliers
 
 
 def main():
