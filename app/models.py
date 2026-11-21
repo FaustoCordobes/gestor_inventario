@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask_login import UserMixin
 
-from extensions import db
+from app.extensions import db
 
 
 class User(UserMixin, db.Model):
@@ -22,18 +22,21 @@ class Category(db.Model):
     products = db.relationship("Product", back_populates="category")
 
 
+SUPPLIER_TYPES = ("Distributor", "Manufacturer", "Importer", "Workshop", "Wholesaler", "Other")
+
+
 class Supplier(db.Model):
     __tablename__ = "suppliers"
 
     id = db.Column(db.Integer, primary_key=True)
-    type_supplier = db.Column(db.String(150), nullable=False)
+    supplier_type = db.Column(db.String(30), nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    last_name = db.Column(db.String(100), unique=True, nullable=False)
+    contact_name = db.Column(db.String(100), nullable=True)
     phone = db.Column(db.String(30))
     email = db.Column(db.String(120))
-    description = db.Column(db.String(150))
+    description = db.Column(db.Text)
     address = db.Column(db.String(150), nullable=True)
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
     products = db.relationship("Product", back_populates="supplier")
 
 

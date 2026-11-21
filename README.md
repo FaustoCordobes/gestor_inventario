@@ -37,7 +37,7 @@ DATABASE_URL=sqlite:///inventario.db
 5. Levantar la aplicación:
 
 ```
-python app.py
+python run.py
 ```
 
 6. Abrir http://127.0.0.1:5000 en el navegador y crear una cuenta desde "Registrate".
@@ -63,17 +63,22 @@ Por ahora incluye los tests del login (`tests/test_auth.py`):
 ## Estructura
 
 ```
-app.py            aplicación principal y registro de blueprints
-config.py         configuración leída desde .env
-extensions.py     base de datos, bcrypt y login
-models.py         User, Category, Supplier y Product
-auth.py           blueprint de login
-dashboard.py      blueprint del dashboard
-inventory.py      blueprint de productos y categorías
-suppliers.py      blueprint de proveedores
-templates/        plantillas HTML
-static/css/       estilos (styles.css)
-tests/            tests con pytest
+run.py                 punto de entrada: levanta la aplicación
+app/
+  __init__.py          create_app() y registro de blueprints
+  config.py            configuración leída desde .env
+  extensions.py        base de datos, bcrypt y login
+  models.py            User, Category, Supplier y Product
+  blueprints/
+    auth.py            login
+    dashboard.py       dashboard
+    inventory.py       productos y categorías
+    supplier.py        proveedores
+  templates/           plantillas HTML
+  static/css/          estilos (styles.css)
+mcp_inventario/        servidor MCP del gestor
+seeds/                 datos de prueba
+tests/                 tests con pytest
 ```
 
 ## Equipo

@@ -3,8 +3,8 @@ from flask import Blueprint, render_template
 from flask_login import login_required
 from sqlalchemy import func
 
-from extensions import db
-from models import Category, Product, Supplier
+from app.extensions import db
+from app.models import Category, Product, Supplier
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 

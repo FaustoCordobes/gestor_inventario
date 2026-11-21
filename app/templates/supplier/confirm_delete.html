@@ -6,7 +6,7 @@
 <h1 class="page-title">Eliminar proveedor</h1>
 
 <div class="card card-form">
-    <p>¿Seguro que querés eliminar a <strong>{{ supplier.name }} {{ supplier.last_name }}</strong>?</p>
+    <p>¿Seguro que querés eliminar a <strong>{{ supplier.name }}</strong>?</p>
     {% if supplier.products %}
         <p class="text-muted">Tiene {{ supplier.products | length }} producto(s). Quedan sin proveedor, pero no se borran.</p>
     {% endif %}

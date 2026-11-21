@@ -44,7 +44,7 @@
                 <tbody>
                     {% for row in top_suppliers %}
                     <tr>
-                        <td><a href="{{ url_for('supplier.detail', supplier_id=row.supplier.id) }}">{{ row.supplier.name }} {{ row.supplier.last_name }}</a></td>
+                        <td><a href="{{ url_for('supplier.detail', supplier_id=row.supplier.id) }}">{{ row.supplier.name }}</a></td>
                         <td>{{ row.products }}</td>
                         <td>${{ "%.2f"|format(row.value) }}</td>
                     </tr>

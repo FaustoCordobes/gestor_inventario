@@ -5,8 +5,8 @@ from flask_login import login_required
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from extensions import db
-from models import Category, Product, Supplier
+from app.extensions import db
+from app.models import Category, Product, Supplier
 
 inventory_bp = Blueprint("inventory", __name__, url_prefix="/inventory")
 

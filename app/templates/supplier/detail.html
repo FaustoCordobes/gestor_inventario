@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}{{ supplier.name }} {{ supplier.last_name }} · Gestor de Inventario{% endblock %}
+{% block title %}{{ supplier.name }} · Gestor de Inventario{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">{{ supplier.name }} {{ supplier.last_name }}</h1>
+    <h1 class="page-title">{{ supplier.name }}</h1>
     <div class="form-buttons">
         <a class="button" href="{{ url_for('supplier.edit', supplier_id=supplier.id) }}">Editar</a>
         <a class="button button-danger" href="{{ url_for('supplier.delete', supplier_id=supplier.id) }}">Eliminar</a>
@@ -14,7 +14,8 @@
 <div class="card">
     <table>
         <tbody>
-            <tr><th>Tipo</th><td>{{ supplier.type_supplier }}</td></tr>
+            <tr><th>Tipo</th><td>{{ supplier.supplier_type }}</td></tr>
+            <tr><th>Contacto</th><td>{{ supplier.contact_name or "-" }}</td></tr>
             <tr><th>Teléfono</th><td>{{ supplier.phone or "-" }}</td></tr>
             <tr><th>Email</th><td>{{ supplier.email or "-" }}</td></tr>
             <tr><th>Dirección</th><td>{{ supplier.address or "-" }}</td></tr>

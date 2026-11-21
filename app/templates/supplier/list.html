@@ -22,7 +22,7 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Apellido</th>
+                    <th>Contacto</th>
                     <th>Tipo</th>
                     <th>Teléfono</th>
                     <th>Email</th>
@@ -34,8 +34,8 @@
                 {% for s in suppliers %}
                 <tr>
                     <td>{{ s.name }}</td>
-                    <td>{{ s.last_name }}</td>
-                    <td>{{ s.type_supplier }}</td>
+                    <td>{{ s.contact_name or "-" }}</td>
+                    <td>{{ s.supplier_type }}</td>
                     <td>{{ s.phone or "-" }}</td>
                     <td>{{ s.email or "-" }}</td>
                     <td>

@@ -1,6 +1,6 @@
 from app import create_app
-from extensions import bcrypt, db
-from models import User
+from app.extensions import bcrypt, db
+from app.models import User
 
 app = create_app()
 

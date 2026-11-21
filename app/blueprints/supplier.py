@@ -5,19 +5,24 @@ from flask_login import login_required
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-from extensions import db
-from models import Supplier
+from app.extensions import db
+from app.models import SUPPLIER_TYPES, Supplier
 
 supplier_bp = Blueprint("supplier", __name__, url_prefix="/supplier")
 
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
 
 
+@supplier_bp.app_context_processor
+def inject_supplier_types():
+    return {"supplier_types": SUPPLIER_TYPES}
+
+
 def _read_form():
     return {
-        "type_supplier": request.form.get("type_supplier", "").strip(),
+        "supplier_type": request.form.get("supplier_type", "").strip(),
         "name": request.form.get("name", "").strip(),
-        "last_name": request.form.get("last_name", "").strip(),
+        "contact_name": request.form.get("contact_name", "").strip(),
         "phone": request.form.get("phone", "").strip(),
         "email": request.form.get("email", "").strip(),
         "address": request.form.get("address", "").strip(),
@@ -28,16 +33,16 @@ def _read_form():
 
 def _empty_form_data():
     return {
-        "type_supplier": "", "name": "", "last_name": "", "phone": "",
+        "supplier_type": "", "name": "", "contact_name": "", "phone": "",
         "email": "", "address": "", "description": "", "is_active": True,
     }
 
 
 def _supplier_form_data(supplier):
     return {
-        "type_supplier": supplier.type_supplier,
+        "supplier_type": supplier.supplier_type,
         "name": supplier.name,
-        "last_name": supplier.last_name,
+        "contact_name": supplier.contact_name or "",
         "phone": supplier.phone or "",
         "email": supplier.email or "",
         "address": supplier.address or "",
@@ -56,16 +61,12 @@ def _name_taken(column, value, supplier_id=None):
 def _validate_supplier(data, supplier_id=None):
     errors = []
 
-    if not data["type_supplier"]:
-        errors.append("El tipo de proveedor es obligatorio.")
+    if data["supplier_type"] not in SUPPLIER_TYPES:
+        errors.append("Elegí un tipo de proveedor válido.")
     if not data["name"]:
         errors.append("El nombre es obligatorio.")
     elif _name_taken(Supplier.name, data["name"], supplier_id):
         errors.append("Ya existe un proveedor con ese nombre.")
-    if not data["last_name"]:
-        errors.append("El apellido es obligatorio.")
-    elif _name_taken(Supplier.last_name, data["last_name"], supplier_id):
-        errors.append("Ya existe un proveedor con ese apellido.")
     if data["email"] and not EMAIL_PATTERN.fullmatch(data["email"]):
         errors.append("El email no es válido.")
 
@@ -73,9 +74,9 @@ def _validate_supplier(data, supplier_id=None):
 
 
 def _save(supplier, data):
-    supplier.type_supplier = data["type_supplier"]
+    supplier.supplier_type = data["supplier_type"]
     supplier.name = data["name"]
-    supplier.last_name = data["last_name"]
+    supplier.contact_name = data["contact_name"] or None
     supplier.phone = data["phone"] or None
     supplier.email = data["email"] or None
     supplier.address = data["address"] or None
@@ -168,7 +169,7 @@ def delete(supplier_id):
             db.session.rollback()
             flash("No se pudo eliminar el proveedor. Probá de nuevo.", "error")
             return redirect(url_for("supplier.detail", supplier_id=supplier.id))
-        flash(f"Proveedor «{supplier.name} {supplier.last_name}» eliminado.", "exito")
+        flash(f"Proveedor «{supplier.name}» eliminado.", "exito")
         return redirect(url_for("supplier.index"))
 
     return render_template("supplier/confirm_delete.html", supplier=supplier)

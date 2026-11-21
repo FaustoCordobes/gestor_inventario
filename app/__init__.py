@@ -1,11 +1,11 @@
 from flask import Flask, redirect, render_template, url_for
 
-from auth import auth_bp
-from config import Config
-from dashboard import dashboard_bp
-from extensions import bcrypt, db, login_manager
-from inventory import inventory_bp
-from supplier import supplier_bp
+from app.blueprints.auth import auth_bp
+from app.blueprints.dashboard import dashboard_bp
+from app.blueprints.inventory import inventory_bp
+from app.blueprints.supplier import supplier_bp
+from app.config import Config
+from app.extensions import bcrypt, db, login_manager
 
 
 def create_app(config_extra=None):
@@ -39,9 +39,3 @@ def create_app(config_extra=None):
         db.create_all()
 
     return app
-
-
-app = create_app()
-
-if __name__ == "__main__":
-    app.run(debug=True)
