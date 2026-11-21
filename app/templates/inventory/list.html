@@ -8,19 +8,15 @@
     <a class="button" href="{{ url_for('inventory.new') }}">+ Agregar producto</a>
 </div>
 
-<form class="filters" method="get" action="{{ url_for('inventory.index') }}">
-    <input type="search" name="q" value="{{ q }}" placeholder="Nombre o código">
-    <select name="category">
+{% from "_search.html" import search_bar with context %}
+{% call search_bar(url_for('inventory.index'), q, "Buscar por nombre o código") %}
+    <select name="category" aria-label="Categoría">
         <option value="">Todas las categorías</option>
         {% for c in categories %}
             <option value="{{ c.id }}" {{ 'selected' if c.id == category_id }}>{{ c.name }}</option>
         {% endfor %}
     </select>
-    <button type="submit" class="button">Filtrar</button>
-    {% if q or category_id %}
-        <a class="button button-light" href="{{ url_for('inventory.index') }}">Limpiar</a>
-    {% endif %}
-</form>
+{% endcall %}
 
 <div class="card">
     {% if products %}

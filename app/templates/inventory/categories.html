@@ -3,16 +3,20 @@
 {% block title %}Categorías · Gestor de Inventario{% endblock %}
 
 {% block content %}
-<h1 class="page-title">Categorías</h1>
+<div class="page-header">
+    <h1 class="page-title">Categorías</h1>
+</div>
 
-<div class="card card-form">
-    <form method="post" class="row-add">
-        <input type="text" name="name" maxlength="60" value="{{ name }}" placeholder="Nombre de la nueva categoría" required>
-        <button type="submit" class="button">Crear categoría</button>
+{% from "_search.html" import search_bar with context %}
+<div class="toolbar">
+    {{ search_bar(url_for('inventory.categories'), q, "Buscar categoría") }}
+    <form method="post" class="create-bar">
+        <input type="text" name="name" maxlength="60" value="{{ name }}" placeholder="Nueva categoría" aria-label="Nombre de la nueva categoría" required>
+        <button type="submit" class="button">Crear</button>
     </form>
 </div>
 
-<div class="card separated">
+<div class="card">
     {% if categories %}
         <table>
             <thead>
@@ -48,7 +52,7 @@
             </tbody>
         </table>
     {% else %}
-        <p class="text-muted">Todavía no hay categorías. Creá la primera arriba.</p>
+        <p class="text-muted">Todavía no hay categorías. Creá la primera desde el formulario de arriba.</p>
     {% endif %}
 </div>
 {% endblock %}

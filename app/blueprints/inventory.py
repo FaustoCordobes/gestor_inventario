@@ -305,8 +305,12 @@ def categories():
                 flash("Categoría creada.", "exito")
                 return redirect(url_for("inventory.categories"))
 
-    all_categories = Category.query.order_by(Category.name).all()
-    return render_template("inventory/categories.html", categories=all_categories, name=name)
+    q = request.args.get("q", "").strip()
+    query = Category.query
+    if q:
+        query = query.filter(Category.name.icontains(q, autoescape=True))
+    all_categories = query.order_by(Category.name).all()
+    return render_template("inventory/categories.html", categories=all_categories, name=name, q=q)
 
 
 @inventory_bp.route("/categories/<int:category_id>/delete", methods=["POST"])

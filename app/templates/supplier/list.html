@@ -8,13 +8,8 @@
     <a class="button" href="{{ url_for('supplier.new') }}">+ Agregar proveedor</a>
 </div>
 
-<form class="filters" method="get" action="{{ url_for('supplier.index') }}">
-    <input type="search" name="q" value="{{ q }}" placeholder="Nombre del proveedor">
-    <button type="submit" class="button">Buscar</button>
-    {% if q %}
-        <a class="button button-light" href="{{ url_for('supplier.index') }}">Limpiar</a>
-    {% endif %}
-</form>
+{% from "_search.html" import search_bar with context %}
+{{ search_bar(url_for('supplier.index'), q, "Buscar por nombre") }}
 
 <div class="card">
     {% if suppliers %}

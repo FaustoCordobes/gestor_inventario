@@ -1,0 +1,17 @@
+{#
+    Barra de búsqueda común a todas las listas.
+    Uso: {% call search_bar(url, valor_actual, "Buscar por ...") %} ...filtros extra... {% endcall %}
+#}
+{% macro search_bar(action, value, placeholder) %}
+<form class="search-bar" role="search" method="get" action="{{ action }}">
+    <label class="search-field">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" name="q" value="{{ value }}" placeholder="{{ placeholder }}" aria-label="{{ placeholder }}">
+    </label>
+    {% if caller is defined %}{{ caller() }}{% endif %}
+    <button type="submit" class="button">Buscar</button>
+    {% if request.args %}
+        <a class="button button-light" href="{{ action }}">Limpiar</a>
+    {% endif %}
+</form>
+{% endmacro %}
