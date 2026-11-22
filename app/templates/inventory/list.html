@@ -18,9 +18,9 @@
     </select>
 {% endcall %}
 
-<div class="card">
+<div class="card card-table">
     {% if products %}
-        <table>
+        <table class="table-stack">
             <thead>
                 <tr>
                     <th>Código</th>
@@ -35,12 +35,12 @@
             <tbody>
                 {% for p in products %}
                 <tr>
-                    <td>{{ p.code }}</td>
-                    <td>{{ p.name }}</td>
-                    <td>{{ p.category.name }}</td>
-                    <td>$ {{ '%.2f' | format(p.price) }}</td>
-                    <td>{{ p.stock }}</td>
-                    <td>
+                    <td data-label="Código">{{ p.code }}</td>
+                    <td class="cell-title">{{ p.name }}</td>
+                    <td data-label="Categoría">{{ p.category.name }}</td>
+                    <td data-label="Precio">$ {{ '%.2f' | format(p.price) }}</td>
+                    <td data-label="Stock">{{ p.stock }}</td>
+                    <td data-label="Estado">
                         {% if p.is_low_stock() %}
                             <span class="tag tag-red">Stock bajo</span>
                         {% else %}

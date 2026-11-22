@@ -12,7 +12,7 @@
 </div>
 
 <div class="card">
-    <table>
+    <table class="table-detail">
         <tbody>
             <tr><th>Tipo</th><td>{{ supplier.supplier_type }}</td></tr>
             <tr><th>Contacto</th><td>{{ supplier.contact_name or "-" }}</td></tr>
@@ -37,6 +37,7 @@
 <div class="card separated">
     <h2>Productos de este proveedor</h2>
     {% if supplier.products %}
+        <div class="table-scroll">
         <table>
             <thead>
                 <tr>
@@ -55,10 +56,11 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% else %}
         <p class="text-muted">Este proveedor todavía no tiene productos asociados.</p>
     {% endif %}
 </div>
 
-<p><a href="{{ url_for('supplier.index') }}">Volver al listado</a></p>
+<p class="back-link"><a href="{{ url_for('supplier.index') }}">← Volver al listado</a></p>
 {% endblock %}

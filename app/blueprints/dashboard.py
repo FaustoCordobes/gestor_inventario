@@ -28,13 +28,23 @@ def _category_chart():
         marker_color="#1c1c1e",
     ))
     fig.update_layout(
+        autosize=True,
         height=320,
-        margin=dict(l=40, r=20, t=20, b=40),
+        margin=dict(l=8, r=8, t=16, b=8),
         yaxis_title="Valor a costo ($)",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
     )
-    return fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+    # automargin deja que Plotly reserve el espacio justo para títulos y etiquetas,
+    # así nada se corta en pantallas angostas.
+    fig.update_xaxes(automargin=True, tickangle=-30)
+    fig.update_yaxes(automargin=True, tickprefix="$", title_standoff=8)
+    return fig.to_html(
+        full_html=False,
+        include_plotlyjs="cdn",
+        default_width="100%",
+        config={"displayModeBar": False, "responsive": True},
+    )
 
 
 def _top_suppliers(limit=4):

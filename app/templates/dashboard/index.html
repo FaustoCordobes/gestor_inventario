@@ -37,6 +37,7 @@
     <div class="card">
         <h2>Principales proveedores</h2>
         {% if top_suppliers %}
+            <div class="table-scroll">
             <table>
                 <thead>
                     <tr><th>Proveedor</th><th>Productos</th><th>Valor</th></tr>
@@ -51,6 +52,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         {% else %}
             <p class="text-muted">No hay proveedores cargados.</p>
         {% endif %}
@@ -59,6 +61,7 @@
     <div class="card">
         <h2>Productos destacados</h2>
         {% if featured %}
+            <div class="table-scroll">
             <table>
                 <thead>
                     <tr><th>Producto</th><th>Stock</th><th>Valor</th></tr>
@@ -73,6 +76,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         {% else %}
             <p class="text-muted">No hay productos cargados.</p>
         {% endif %}
@@ -82,6 +86,7 @@
 <div class="card separated">
     <h2>Productos con stock bajo</h2>
     {% if low_stock %}
+        <div class="table-scroll">
         <table>
             <thead>
                 <tr><th>Código</th><th>Producto</th><th>Stock</th><th>Mínimo</th></tr>
@@ -97,6 +102,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     {% else %}
         <p class="text-muted">No hay productos con stock bajo.</p>
     {% endif %}

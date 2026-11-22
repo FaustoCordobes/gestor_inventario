@@ -10,7 +10,7 @@
         <div class="row-double">
             <div>
                 <label for="supplier_type">Tipo de proveedor *</label>
-                <select id="supplier_type" name="supplier_type" required autofocus>
+                <select id="supplier_type" name="supplier_type" required data-autofocus>
                     <option value="" disabled {{ 'selected' if not data.supplier_type }}>Elegí un tipo</option>
                     {% for t in supplier_types %}
                     <option value="{{ t }}" {{ 'selected' if data.supplier_type == t }}>{{ t }}</option>

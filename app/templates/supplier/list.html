@@ -11,9 +11,9 @@
 {% from "_search.html" import search_bar with context %}
 {{ search_bar(url_for('supplier.index'), q, "Buscar por nombre") }}
 
-<div class="card">
+<div class="card card-table">
     {% if suppliers %}
-        <table>
+        <table class="table-stack">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -28,12 +28,12 @@
             <tbody>
                 {% for s in suppliers %}
                 <tr>
-                    <td>{{ s.name }}</td>
-                    <td>{{ s.contact_name or "-" }}</td>
-                    <td>{{ s.supplier_type }}</td>
-                    <td>{{ s.phone or "-" }}</td>
-                    <td>{{ s.email or "-" }}</td>
-                    <td>
+                    <td class="cell-title">{{ s.name }}</td>
+                    <td data-label="Contacto">{{ s.contact_name or "-" }}</td>
+                    <td data-label="Tipo">{{ s.supplier_type }}</td>
+                    <td data-label="Teléfono">{{ s.phone or "-" }}</td>
+                    <td data-label="Email">{{ s.email or "-" }}</td>
+                    <td data-label="Estado">
                         {% if s.is_active %}
                             <span class="tag tag-green">Activo</span>
                         {% else %}
