@@ -1,6 +1,6 @@
 from sqlalchemy import func
 
-from app.blueprints.supplier import _validate_supplier
+from app.blueprints.supplier import _supplier_form_data, _validate_supplier
 from app.extensions import db
 from app.models import Supplier
 from mcp_inventario.core import flask_app, mcp
@@ -12,6 +12,24 @@ def _find_supplier(nombre):
     if supplier is None:
         raise ValueError(f"No existe un proveedor llamado {nombre}.")
     return supplier
+
+
+def _save_supplier(supplier, data):
+    supplier.supplier_type = data["supplier_type"]
+    supplier.name = data["name"]
+    supplier.contact_name = data["contact_name"] or None
+    supplier.phone = data["phone"] or None
+    supplier.email = data["email"] or None
+    supplier.address = data["address"] or None
+    supplier.description = data["description"] or None
+    supplier.is_active = data["is_active"]
+    try:
+        db.session.add(supplier)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise ValueError("No se pudo guardar el proveedor. Probá de nuevo.")
+    return supplier_to_dict(supplier)
 
 
 @mcp.tool()
@@ -67,20 +85,59 @@ def create_supplier(
         if errors:
             raise ValueError(" ".join(errors))
 
-        supplier = Supplier(
-            supplier_type=data["supplier_type"],
-            name=data["name"],
-            contact_name=data["contact_name"] or None,
-            phone=data["phone"] or None,
-            email=data["email"] or None,
-            address=data["address"] or None,
-            description=data["description"] or None,
-            is_active=data["is_active"],
-        )
+        return _save_supplier(Supplier(), data)
+
+
+@mcp.tool()
+def update_supplier(
+    nombre: str,
+    nuevo_nombre: str | None = None,
+    tipo: str | None = None,
+    contacto: str | None = None,
+    telefono: str | None = None,
+    email: str | None = None,
+    direccion: str | None = None,
+    descripcion: str | None = None,
+    activo: bool | None = None,
+) -> dict:
+    """Edita un proveedor buscado por su nombre exacto. Solo cambia los campos que se pasan; los omitidos quedan igual. Para vaciar un campo de texto, pasar una cadena vacía. Devuelve el proveedor actualizado."""
+    with flask_app.app_context():
+        supplier = _find_supplier(nombre)
+        data = _supplier_form_data(supplier)
+
+        if nuevo_nombre is not None:
+            data["name"] = nuevo_nombre.strip()
+        if tipo is not None:
+            data["supplier_type"] = tipo.strip()
+        if contacto is not None:
+            data["contact_name"] = contacto.strip()
+        if telefono is not None:
+            data["phone"] = telefono.strip()
+        if email is not None:
+            data["email"] = email.strip()
+        if direccion is not None:
+            data["address"] = direccion.strip()
+        if descripcion is not None:
+            data["description"] = descripcion.strip()
+        if activo is not None:
+            data["is_active"] = activo
+
+        errors = _validate_supplier(data, supplier_id=supplier.id)
+        if errors:
+            raise ValueError(" ".join(errors))
+        return _save_supplier(supplier, data)
+
+
+@mcp.tool()
+def delete_supplier(nombre: str) -> dict:
+    """Elimina un proveedor buscado por su nombre exacto. Sus productos no se borran: quedan sin proveedor, igual que en la web."""
+    with flask_app.app_context():
+        supplier = _find_supplier(nombre)
+        name = supplier.name
         try:
-            db.session.add(supplier)
+            db.session.delete(supplier)
             db.session.commit()
         except Exception:
             db.session.rollback()
-            raise ValueError("No se pudo guardar el proveedor. Probá de nuevo.")
-        return supplier_to_dict(supplier)
+            raise ValueError("No se pudo eliminar el proveedor. Probá de nuevo.")
+        return {"eliminado": True, "nombre": name}
