@@ -1,9 +1,10 @@
 import re
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from authlib.integrations.base_client.errors import OAuthError
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
-from app.extensions import bcrypt, db, login_manager
+from app.extensions import bcrypt, db, login_manager, oauth
 from app.models import User
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -72,7 +73,7 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         password_ok = False
-        if user and len(password.encode("utf-8")) <= MAX_PASSWORD_BYTES:
+        if user and user.password_hash and len(password.encode("utf-8")) <= MAX_PASSWORD_BYTES:
             try:
                 password_ok = bcrypt.check_password_hash(user.password_hash, password)
             except ValueError:
@@ -86,6 +87,51 @@ def login():
         return render_template("auth/login.html", email=email)
 
     return render_template("auth/login.html")
+
+
+@auth_bp.route("/google")
+def google_login():
+    """Manda a la persona a la pantalla de Google para que elija su cuenta."""
+    if not current_app.config.get("GOOGLE_CLIENT_ID") or not current_app.config.get("GOOGLE_CLIENT_SECRET"):
+        flash("El inicio de sesión con Google no está configurado.", "error")
+        return redirect(url_for("auth.login"))
+
+    redirect_uri = url_for("auth.google_callback", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@auth_bp.route("/google/callback")
+def google_callback():
+    """Google vuelve acá: se validan los datos y se inicia la sesión."""
+    try:
+        token = oauth.google.authorize_access_token()
+    except OAuthError:
+        flash("No se pudo iniciar sesión con Google. Probá de nuevo.", "error")
+        return redirect(url_for("auth.login"))
+    except Exception:
+        flash("No se pudo conectar con Google. Probá de nuevo.", "error")
+        return redirect(url_for("auth.login"))
+
+    info = token.get("userinfo") or {}
+    email = (info.get("email") or "").strip().lower()
+    if not email or len(email) > 120 or not info.get("email_verified"):
+        flash("Tu cuenta de Google no tiene un email verificado.", "error")
+        return redirect(url_for("auth.login"))
+
+    user = User.query.filter_by(email=email).first()
+    if user is None:
+        name = (info.get("name") or email).strip()[:80]
+        user = User(name=name, email=email, password_hash=None)
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash("No se pudo crear la cuenta. Probá de nuevo.", "error")
+            return redirect(url_for("auth.login"))
+
+    login_user(user)
+    return redirect(url_for("dashboard.index"))
 
 
 @auth_bp.route("/logout")
