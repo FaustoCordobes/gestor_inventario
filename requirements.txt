@@ -6,3 +6,5 @@ plotly
 python-dotenv
 pytest
 mcp<2
+gunicorn
+# psycopg2-binary  (descomentar si se usa PostgreSQL en Render)
