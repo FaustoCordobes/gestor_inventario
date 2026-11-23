@@ -11,6 +11,16 @@ from app.models import SUPPLIER_TYPES, Supplier
 supplier_bp = Blueprint("supplier", __name__, url_prefix="/supplier")
 
 EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
+PHONE_PATTERN = re.compile(r"[0-9+\-().\s]+")
+
+# Largo máximo de cada campo (el mismo que tiene la columna en la base de datos).
+MAX_LENGTHS = {
+    "name": ("El nombre", 100),
+    "contact_name": ("La persona de contacto", 100),
+    "phone": ("El teléfono", 30),
+    "email": ("El email", 120),
+    "address": ("La dirección", 150),
+}
 
 
 @supplier_bp.app_context_processor
@@ -69,6 +79,14 @@ def _validate_supplier(data, supplier_id=None):
         errors.append("Ya existe un proveedor con ese nombre.")
     if data["email"] and not EMAIL_PATTERN.fullmatch(data["email"]):
         errors.append("El email no es válido.")
+    if data["phone"]:
+        digits = sum(ch.isdigit() for ch in data["phone"])
+        if not PHONE_PATTERN.fullmatch(data["phone"]) or digits < 6:
+            errors.append("El teléfono solo puede tener números, espacios, +, -, ( ) y punto (mínimo 6 dígitos).")
+
+    for field, (label, maximum) in MAX_LENGTHS.items():
+        if len(data[field]) > maximum:
+            errors.append(f"{label} puede tener hasta {maximum} caracteres.")
 
     return errors
 
@@ -87,7 +105,7 @@ def _save(supplier, data):
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        flash("Ya existe un proveedor con ese nombre o apellido.", "error")
+        flash("Ya existe un proveedor con ese nombre.", "error")
         return False
     except Exception:
         db.session.rollback()
