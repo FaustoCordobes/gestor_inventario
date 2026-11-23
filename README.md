@@ -90,3 +90,13 @@ tests/                 tests con pytest
 - Integrante 1: base del proyecto y login
 - Integrante 2: inventario
 - Integrante 3: proveedores y dashboard
+
+## Consumo de API externa: cotización del dólar
+
+El Dashboard consulta la API pública [DolarApi](https://dolarapi.com) para mostrar la cotización del dólar oficial (compra y venta) y el valor del inventario expresado en dólares.
+
+- `app/services/exchange_rate.py` hace el pedido `GET` a `https://dolarapi.com/v1/dolares/oficial` con la librería `requests`, revisa el código de estado y convierte el JSON en un diccionario de Python.
+- Todo está dentro de un `try/except`: si la API no responde, tarda demasiado o devuelve un error, el Dashboard sigue funcionando y muestra un aviso.
+- La ruta `/dashboard/api/dolar` devuelve la cotización en JSON con `jsonify` (o un error 503 si no se pudo obtener).
+- Los tests están en `tests/test_dolar_api.py` y simulan las respuestas de la API, así que no necesitan conexión a internet.
+
