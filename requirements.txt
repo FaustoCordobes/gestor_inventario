@@ -7,4 +7,6 @@ python-dotenv
 pytest
 mcp<2
 gunicorn
+authlib
+requests
 # psycopg2-binary  (descomentar si se usa PostgreSQL en Render)
