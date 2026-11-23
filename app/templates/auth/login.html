@@ -20,6 +20,11 @@
         <button type="submit" class="button button-wide">Entrar</button>
     </form>
 
+    {% if config.GOOGLE_CLIENT_ID %}
+    <p class="text-muted access-footer">o</p>
+    <a class="button button-light button-wide" href="{{ url_for('auth.google_login') }}">Continuar con Google</a>
+    {% endif %}
+
     <p class="text-muted access-footer">¿No tenés cuenta? <a href="{{ url_for('auth.register') }}">Registrate</a></p>
 </div>
 {% endblock %}
