@@ -1,4 +1,5 @@
 import math
+import re
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
@@ -15,16 +16,49 @@ inventory_bp = Blueprint("inventory", __name__, url_prefix="/inventory")
 # Auxiliares
 # ---------------------------------------------------------------------------
 
+# Límites razonables para que no entren valores absurdos (y no desborde la base).
+MAX_MONEY = 1_000_000_000
+MAX_STOCK = 1_000_000
+
+_NUMBER_RE = re.compile(r"[+-]?\d+(?:[.,]\d+)?", re.ASCII)
+_INTEGER_RE = re.compile(r"[+-]?\d+", re.ASCII)
+_ID_RE = re.compile(r"\d{1,9}", re.ASCII)
+
+
 def _to_number(text, integer=False):
-    """Convierte un texto a número. Devuelve None si no es un número válido."""
-    text = (text or "").strip().replace(",", ".")
-    try:
-        value = int(text) if integer else float(text)
-    except ValueError:
+    """Convierte un texto a número. Devuelve None si no es un número válido.
+
+    Solo acepta dígitos ASCII con un separador decimal opcional (coma o punto).
+    Rechaza notación científica (1e3), guiones bajos (1_000), dígitos que no
+    son del 0 al 9 y separadores de miles.
+    """
+    text = (text or "").strip()
+    if integer:
+        if not _INTEGER_RE.fullmatch(text):
+            return None
+        return int(text)
+    if not _NUMBER_RE.fullmatch(text):
         return None
-    if isinstance(value, float) and not math.isfinite(value):
+    value = float(text.replace(",", "."))
+    if not math.isfinite(value):
         return None
     return value
+
+
+def _parse_id(text):
+    """Convierte el id de un <select> a entero. Devuelve None si no es un id válido."""
+    text = (text or "").strip()
+    if not _ID_RE.fullmatch(text):
+        return None
+    return int(text)
+
+
+def _format_number(value):
+    """Número -> texto para el formulario, sin notación científica ni perder decimales."""
+    text = f"{value:.2f}"
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text
 
 
 def _read_form():
@@ -68,15 +102,15 @@ def _validate_product(data, product_id=None):
     if len(data["name"]) > 100:
         errors.append("El nombre puede tener hasta 100 caracteres.")
 
-    # Números: tienen que ser números y no pueden ser negativos
+    # Números: tienen que ser números, no negativos y no pasarse de un máximo
     numeric_fields = [
-        ("price", "El precio", False, True),
-        ("cost", "El costo", False, False),
-        ("stock", "El stock", True, True),
-        ("min_stock", "El stock mínimo", True, False),
+        ("price", "El precio", False, True, MAX_MONEY),
+        ("cost", "El costo", False, False, MAX_MONEY),
+        ("stock", "El stock", True, True, MAX_STOCK),
+        ("min_stock", "El stock mínimo", True, False, MAX_STOCK),
     ]
     defaults = {"cost": 0.0, "min_stock": 5}
-    for field, label, integer, required in numeric_fields:
+    for field, label, integer, required, maximum in numeric_fields:
         text = data[field]
         if not text:
             if not required:
@@ -88,14 +122,21 @@ def _validate_product(data, product_id=None):
             errors.append(f"{label} tiene que ser {kind}.")
         elif value < 0:
             errors.append(f"{label} no puede ser negativo.")
+        elif value > maximum:
+            errors.append(f"{label} no puede ser mayor a {maximum:,}.".replace(",", "."))
+        elif not integer and re.search(r"[.,]\d{3,}$", text):
+            errors.append(
+                f"{label} puede tener hasta 2 decimales (no uses puntos para separar los miles)."
+            )
         else:
             clean[field] = value
 
     # Categoría y proveedor tienen que existir
     category = None
     if data["category_id"]:
-        if data["category_id"].isdigit():
-            category = db.session.get(Category, int(data["category_id"]))
+        category_id = _parse_id(data["category_id"])
+        if category_id is not None:
+            category = db.session.get(Category, category_id)
         if category is None:
             errors.append("Elegí una categoría de la lista.")
     clean["category_id"] = category.id if category else None
@@ -103,8 +144,9 @@ def _validate_product(data, product_id=None):
     supplier_id = None
     if data["supplier_id"]:
         supplier = None
-        if data["supplier_id"].isdigit():
-            supplier = db.session.get(Supplier, int(data["supplier_id"]))
+        parsed_id = _parse_id(data["supplier_id"])
+        if parsed_id is not None:
+            supplier = db.session.get(Supplier, parsed_id)
         if supplier is None:
             errors.append("Elegí un proveedor de la lista.")
         else:
@@ -137,8 +179,8 @@ def _product_form_data(product):
         "code": product.code,
         "name": product.name,
         "description": product.description or "",
-        "price": f"{product.price:g}",
-        "cost": f"{product.cost:g}",
+        "price": _format_number(product.price),
+        "cost": _format_number(product.cost),
         "stock": str(product.stock),
         "min_stock": str(product.min_stock),
         "category_id": str(product.category_id),
@@ -154,12 +196,21 @@ def _empty_form_data():
 
 
 def _render_form(product, data):
+    # Se listan los proveedores activos y, si el producto ya tiene uno inactivo,
+    # también ese: si no, al guardar se le sacaría el proveedor sin avisar.
+    current_id = _parse_id(data.get("supplier_id", ""))
+    suppliers = (
+        Supplier.query
+        .filter(db.or_(Supplier.is_active.is_(True), Supplier.id == current_id))
+        .order_by(Supplier.name)
+        .all()
+    )
     return render_template(
         "inventory/form.html",
         product=product,
         data=data,
         categories=Category.query.order_by(Category.name).all(),
-        suppliers=Supplier.query.filter_by(is_active=True).order_by(Supplier.name).all(),
+        suppliers=suppliers,
     )
 
 
@@ -191,6 +242,8 @@ def _save(product, clean):
 def index():
     q = request.args.get("q", "").strip()
     category_id = request.args.get("category", type=int)
+    if category_id is not None and not 0 < category_id < 2**31:
+        category_id = None
 
     query = Product.query
     if q:

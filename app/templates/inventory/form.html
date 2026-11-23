@@ -64,7 +64,7 @@
                 <select id="supplier_id" name="supplier_id">
                     <option value="">Sin proveedor</option>
                     {% for s in suppliers %}
-                        <option value="{{ s.id }}" {{ 'selected' if data.supplier_id == s.id | string }}>{{ s.name }}</option>
+                        <option value="{{ s.id }}" {{ 'selected' if data.supplier_id == s.id | string }}>{{ s.name }}{{ ' (inactivo)' if not s.is_active }}</option>
                     {% endfor %}
                 </select>
             </div>
