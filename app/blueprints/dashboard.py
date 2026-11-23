@@ -1,10 +1,11 @@
 import plotly.graph_objects as go
-from flask import Blueprint, render_template
+from flask import Blueprint, jsonify, render_template
 from flask_login import login_required
 from sqlalchemy import func
 
 from app.extensions import db
 from app.models import Category, Product, Supplier
+from app.services.exchange_rate import get_dollar_rate
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
@@ -64,6 +65,8 @@ def index():
     inventory_value = db.session.query(func.sum(STOCK_VALUE)).scalar() or 0
     active_suppliers = Supplier.query.filter_by(is_active=True).count()
     featured = Product.query.order_by(STOCK_VALUE.desc()).limit(5).all()
+    dollar = get_dollar_rate()
+    inventory_value_usd = inventory_value / dollar["sell"] if dollar and dollar["sell"] > 0 else None
 
     return render_template(
         "dashboard/index.html",
@@ -75,4 +78,15 @@ def index():
         top_suppliers=_top_suppliers(),
         featured=featured,
         low_stock=low_stock,
+        dollar=dollar,
+        inventory_value_usd=inventory_value_usd,
     )
+
+
+@dashboard_bp.route("/api/dolar")
+@login_required
+def dollar_api():
+    dollar = get_dollar_rate()
+    if dollar is None:
+        return jsonify({"error": "No se pudo obtener la cotización del dólar."}), 503
+    return jsonify(dollar)

@@ -25,6 +25,29 @@
 </div>
 
 <div class="card separated">
+    <h2>Cotización del dólar oficial</h2>
+    {% if dollar %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="text-muted">Compra</span>
+                <strong>${{ "%.2f"|format(dollar.buy) }}</strong>
+            </div>
+            <div class="metric">
+                <span class="text-muted">Venta</span>
+                <strong>${{ "%.2f"|format(dollar.sell) }}</strong>
+            </div>
+            <div class="metric">
+                <span class="text-muted">Valor del inventario en dólares</span>
+                <strong>US${{ "%.2f"|format(inventory_value_usd) }}</strong>
+            </div>
+        </div>
+        <p class="text-muted">Fuente: DolarApi (dolarapi.com){% if dollar.updated_at %} · Actualizado: {{ dollar.updated_at[:16]|replace("T", " ") }}{% endif %}</p>
+    {% else %}
+        <p class="text-muted">No se pudo obtener la cotización del dólar en este momento. El resto del sistema funciona normalmente.</p>
+    {% endif %}
+</div>
+
+<div class="card separated">
     <h2>Valor del inventario por categoría</h2>
     {% if chart_html %}
         {{ chart_html | safe }}
