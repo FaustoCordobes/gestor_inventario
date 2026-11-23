@@ -32,7 +32,11 @@ pip install -r requirements.txt
 ```
 SECRET_KEY=una-clave-larga-y-secreta
 DATABASE_URL=sqlite:///inventario.db
+GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=tu-client-secret
 ```
+
+Las credenciales de Google se crean en Google Cloud Console (Credenciales > ID de cliente de OAuth > Aplicación web). En "URI de redireccionamiento autorizados" hay que cargar `http://127.0.0.1:5000/auth/google/callback` y, en Render, `https://TU-APP.onrender.com/auth/google/callback`. Si las variables no están definidas, el botón "Continuar con Google" no se muestra y el login con email y contraseña sigue funcionando.
 
 5. Levantar la aplicación:
 
