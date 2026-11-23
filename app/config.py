@@ -18,8 +18,9 @@ def _secret_key():
 def _database_url():
     url = os.getenv("DATABASE_URL", "sqlite:///inventory.db")
     # Render entrega "postgres://", pero SQLAlchemy necesita "postgresql://".
-    if url.startswith("postgres://"):
-        url = "postgresql://" + url[len("postgres://"):]
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg2://" + url[len(prefix):]
     return url
 
 
