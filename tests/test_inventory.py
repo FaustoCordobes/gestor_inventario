@@ -95,3 +95,39 @@ def test_categoria_con_productos_no_se_elimina(client, category):
 
     client.post(f"/inventory/categories/{empty.id}/delete")
     assert db.session.get(Category, empty.id) is None
+
+
+def test_eliminar_categoria_pide_confirmacion_antes_de_borrar(client):
+    vacia = Category(name="Limpieza")
+    db.session.add(vacia)
+    db.session.commit()
+
+    response = client.get(f"/inventory/categories/{vacia.id}/delete")
+    html = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "¿Seguro que querés eliminar la categoría" in html
+    assert "Limpieza" in html
+    assert db.session.get(Category, vacia.id) is not None
+
+    client.post(f"/inventory/categories/{vacia.id}/delete")
+    assert db.session.get(Category, vacia.id) is None
+
+
+def test_confirmacion_de_categoria_con_productos_redirige_sin_borrar(client, category):
+    client.post("/inventory/new", data=product_data(category))
+
+    response = client.get(f"/inventory/categories/{category.id}/delete")
+
+    assert response.status_code == 302
+    assert db.session.get(Category, category.id) is not None
+
+
+def test_listado_de_categorias_ya_no_usa_alerta_del_navegador(client):
+    db.session.add(Category(name="Limpieza"))
+    db.session.commit()
+
+    html = client.get("/inventory/categories").get_data(as_text=True)
+
+    assert "confirm(" not in html
+    assert "/delete" in html

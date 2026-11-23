@@ -46,10 +46,7 @@
                         {% if c.products %}
                             <span class="text-muted">No se puede eliminar: tiene productos</span>
                         {% else %}
-                            <form method="post" action="{{ url_for('inventory.delete_category', category_id=c.id) }}"
-                                  onsubmit='return confirm({{ ("¿Eliminar la categoría " ~ c.name ~ "?") | tojson }});'>
-                                <button type="submit" class="link-button link-danger">Eliminar</button>
-                            </form>
+                            <a class="link-danger" href="{{ url_for('inventory.delete_category', category_id=c.id) }}">Eliminar</a>
                         {% endif %}
                     </td>
                 </tr>

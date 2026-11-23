@@ -371,7 +371,7 @@ def categories():
     )
 
 
-@inventory_bp.route("/categories/<int:category_id>/delete", methods=["POST"])
+@inventory_bp.route("/categories/<int:category_id>/delete", methods=["GET", "POST"])
 @login_required
 def delete_category(category_id):
     category = db.get_or_404(Category, category_id)
@@ -384,12 +384,15 @@ def delete_category(category_id):
         )
         return redirect(url_for("inventory.categories"))
 
-    try:
-        db.session.delete(category)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        flash("No se pudo eliminar la categoría. Probá de nuevo.", "error")
-    else:
-        flash("Categoría eliminada.", "exito")
-    return redirect(url_for("inventory.categories"))
+    if request.method == "POST":
+        try:
+            db.session.delete(category)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash("No se pudo eliminar la categoría. Probá de nuevo.", "error")
+        else:
+            flash("Categoría eliminada.", "exito")
+        return redirect(url_for("inventory.categories"))
+
+    return render_template("inventory/confirm_delete_category.html", category=category)

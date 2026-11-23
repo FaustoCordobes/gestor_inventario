@@ -109,5 +109,6 @@ La sección de Analíticas consulta la API pública [DolarApi](https://dolarapi.
 
 - `app/services/exchange_rate.py` hace el pedido `GET` a `https://dolarapi.com/v1/dolares/oficial` con la librería `requests`, revisa el código de estado y convierte el JSON en un diccionario de Python.
 - Todo está dentro de un `try/except`: si la API no responde, tarda demasiado o devuelve un error, Analíticas sigue funcionando y muestra un aviso.
+- La cotización se guarda en memoria durante 10 minutos, así Analíticas no espera a la API en cada visita. Si la consulta falla, se sigue mostrando la última cotización guardada y se vuelve a intentar al minuto.
 - La ruta `/dashboard/api/dolar` devuelve la cotización en JSON con `jsonify` (o un error 503 si no se pudo obtener).
 - Los tests están en `tests/test_dolar_api.py` y simulan las respuestas de la API, así que no necesitan conexión a internet.
