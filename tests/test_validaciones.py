@@ -142,8 +142,8 @@ def test_proveedor_rechaza_telefono_con_letras(client):
 
 
 def test_registro_rechaza_contrasena_demasiado_larga(client):
-    anonimo = client.application.test_client()
-    response = anonimo.post("/auth/register", data={
+    client.get("/auth/logout")
+    response = client.post("/auth/register", data={
         "name": "Beto",
         "email": "beto@mail.com",
         "password": "a" * 80,
@@ -194,3 +194,4 @@ def test_errores_de_registro_aparecen_en_cada_campo(app):
     assert 'id="email-error"' in html
     assert 'id="password-error"' in html
     assert 'id="name-error"' not in html
+    
