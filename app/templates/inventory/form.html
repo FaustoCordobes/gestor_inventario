@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+{% import "_forms.html" as forms %}
 
 {% block title %}{{ 'Editar producto' if product else 'Nuevo producto' }} · Gestor de Inventario{% endblock %}
 
 {% block content %}
-<h1 class="page-title">{{ 'Editar producto' if product else 'Nuevo producto' }}</h1>
+<div class="page-header">
+    <h1 class="page-title">{{ 'Editar producto' if product else 'Nuevo producto' }}</h1>
+</div>
 
 {% if not categories %}
     <div class="card">
@@ -11,70 +14,82 @@
         <a class="button" href="{{ url_for('inventory.categories') }}">Crear una categoría</a>
     </div>
 {% else %}
-<div class="card card-form">
+<div class="card card-form card-fill">
     <form method="post" class="form form-no-margin" novalidate>
         <div class="row-double">
             <div>
                 <label for="code">Código *</label>
-                <input type="text" id="code" name="code" maxlength="20" value="{{ data.code }}" required data-autofocus>
+                <input type="text" id="code" name="code" maxlength="20" value="{{ data.code }}" required data-autofocus{{ forms.invalid(errors, "code") }}>
+                {{ forms.error(errors, "code") }}
             </div>
             <div>
                 <label for="name">Nombre *</label>
-                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" required>
+                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" required{{ forms.invalid(errors, "name") }}>
+                {{ forms.error(errors, "name") }}
             </div>
         </div>
 
-        <label for="description">Descripción</label>
-        <textarea id="description" name="description" rows="3">{{ data.description }}</textarea>
+        <div class="field">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="3">{{ data.description }}</textarea>
+        </div>
 
         <div class="row-double">
             <div>
                 <label for="price">Precio de venta *</label>
-                <input type="number" id="price" name="price" min="0" step="0.01" value="{{ data.price }}" required>
+                <input type="number" id="price" name="price" min="0" step="0.01" value="{{ data.price }}" required{{ forms.invalid(errors, "price") }}>
+                {{ forms.error(errors, "price") }}
             </div>
             <div>
                 <label for="cost">Costo</label>
-                <input type="number" id="cost" name="cost" min="0" step="0.01" value="{{ data.cost }}">
+                <input type="number" id="cost" name="cost" min="0" step="0.01" value="{{ data.cost }}"{{ forms.invalid(errors, "cost") }}>
+                {{ forms.error(errors, "cost") }}
             </div>
         </div>
 
         <div class="row-double">
             <div>
                 <label for="stock">Stock actual *</label>
-                <input type="number" id="stock" name="stock" min="0" step="1" value="{{ data.stock }}" required>
+                <input type="number" id="stock" name="stock" min="0" step="1" value="{{ data.stock }}" required{{ forms.invalid(errors, "stock") }}>
+                {{ forms.error(errors, "stock") }}
             </div>
             <div>
                 <label for="min_stock">Stock mínimo</label>
-                <input type="number" id="min_stock" name="min_stock" min="0" step="1" value="{{ data.min_stock }}">
+                <input type="number" id="min_stock" name="min_stock" min="0" step="1" value="{{ data.min_stock }}"{{ forms.invalid(errors, "min_stock") }}>
+                {{ forms.error(errors, "min_stock") }}
             </div>
         </div>
 
         <div class="row-double">
             <div>
                 <label for="category_id">Categoría *</label>
-                <select id="category_id" name="category_id" required>
+                <select id="category_id" name="category_id" required{{ forms.invalid(errors, "category_id") }}>
                     <option value="">Elegí una categoría</option>
                     {% for c in categories %}
                         <option value="{{ c.id }}" {{ 'selected' if data.category_id == c.id | string }}>{{ c.name }}</option>
                     {% endfor %}
                 </select>
+                {{ forms.error(errors, "category_id") }}
             </div>
             <div>
                 <label for="supplier_id">Proveedor</label>
-                <select id="supplier_id" name="supplier_id">
+                <select id="supplier_id" name="supplier_id"{{ forms.invalid(errors, "supplier_id") }}>
                     <option value="">Sin proveedor</option>
                     {% for s in suppliers %}
                         <option value="{{ s.id }}" {{ 'selected' if data.supplier_id == s.id | string }}>{{ s.name }}{{ ' (inactivo)' if not s.is_active }}</option>
                     {% endfor %}
                 </select>
+                {{ forms.error(errors, "supplier_id") }}
             </div>
         </div>
 
-        <p class="text-muted form-note">Los campos con * son obligatorios.</p>
+        <div class="form-footer">
+            <p class="text-muted form-note">Los campos con * son obligatorios.</p>
 
-        <div class="form-buttons">
-            <button type="submit" class="button">{{ 'Guardar cambios' if product else 'Crear producto' }}</button>
-            <a class="button button-light" href="{{ url_for('inventory.index') }}">Cancelar</a>
+            <div class="form-buttons">
+                <button type="submit" class="button">{{ 'Guardar cambios' if product else 'Crear producto' }}</button>
+                <a class="button button-light" href="{{ url_for('inventory.index') }}">Cancelar</a>
+            </div>
         </div>
     </form>
 </div>

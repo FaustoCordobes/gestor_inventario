@@ -2,12 +2,12 @@
 
 Trabajo Práctico Integrador de Análisis y Metodologías de Sistemas (Da Vinci).
 
-Sistema web para llevar el inventario de un comercio: productos, categorías y proveedores, con un dashboard de métricas. Está hecho en Python con Flask, plantillas Jinja2 y Flask-SQLAlchemy sobre SQLite.
+Sistema web para llevar el inventario de un comercio: productos, categorías y proveedores, con una sección de analíticas. Está hecho en Python con Flask, plantillas Jinja2 y Flask-SQLAlchemy sobre SQLite.
 
 ## Módulos
 
 - **Login:** registro, inicio y cierre de sesión. Sin sesión no se puede entrar al resto del sistema.
-- **Dashboard:** métricas del inventario, valor por categoría, proveedores y productos con stock bajo.
+- **Analíticas:** métricas del inventario, valor por categoría, proveedores y productos con stock bajo.
 - **Inventario:** alta, listado, búsqueda, modificación y baja de productos y categorías.
 - **Proveedores:** alta, listado, modificación y baja de proveedores.
 
@@ -48,6 +48,18 @@ python run.py
 
 La base de datos se crea sola la primera vez, dentro de la carpeta `instance/`.
 
+## Datos de prueba
+
+Para cargar usuarios, categorías, proveedores y productos de ejemplo, correr desde la raíz del proyecto (con el entorno virtual activado):
+
+```
+python -m seeds.seed_all
+```
+
+Los usuarios de prueba (por ejemplo `emma.johnson@example.com`) tienen la contraseña `password123`. Los usuarios que ya existen se saltean, así que el comando se puede repetir.
+
+Cada parte también se puede cargar por separado: `python -m seeds.seed_users`, `python -m seeds.seed_categories`, `python -m seeds.seed_suppliers` y `python -m seeds.seed_products`.
+
 ## Tests
 
 Se ejecutan con:
@@ -75,7 +87,7 @@ app/
   models.py            User, Category, Supplier y Product
   blueprints/
     auth.py            login
-    dashboard.py       dashboard
+    dashboard.py       analíticas
     inventory.py       productos y categorías
     supplier.py        proveedores
   templates/           plantillas HTML
@@ -89,4 +101,4 @@ tests/                 tests con pytest
 
 - Integrante 1: base del proyecto y login
 - Integrante 2: inventario
-- Integrante 3: proveedores y dashboard
+- Integrante 3: proveedores y analíticas

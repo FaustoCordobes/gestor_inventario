@@ -1,0 +1,19 @@
+{#
+    Errores de campo: el mensaje aparece justo debajo del campo que falló.
+    Uso, con la variable `errors` (un diccionario campo -> mensaje):
+        {% import "_forms.html" as forms %}
+        <input id="code" name="code" {{ forms.invalid(errors, "code") }}>
+        {{ forms.error(errors, "code") }}
+#}
+{% macro invalid(errors, name) -%}
+    {%- if errors and errors.get(name) %} aria-invalid="true" aria-describedby="{{ name }}-error"{% endif -%}
+{%- endmacro %}
+
+{% macro error(errors, name) -%}
+    {%- if errors and errors.get(name) -%}
+    <p class="field-error" id="{{ name }}-error" role="alert">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        <span>{{ errors[name] }}</span>
+    </p>
+    {%- endif -%}
+{%- endmacro %}

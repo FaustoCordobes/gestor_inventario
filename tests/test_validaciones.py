@@ -151,3 +151,46 @@ def test_registro_rechaza_contrasena_demasiado_larga(client):
     })
 
     assert "demasiado larga" in response.get_data(as_text=True)
+
+
+# --- Errores de campo: cada mensaje aparece debajo de su campo ---
+
+def test_errores_de_producto_aparecen_en_cada_campo(client, category):
+    html = post_new(client, category, price="abc", stock="", code="")
+
+    for campo in ("price", "stock", "code"):
+        assert f'id="{campo}-error"' in html
+        assert f'aria-describedby="{campo}-error"' in html
+    # El nombre está bien: no lleva error
+    assert 'id="name-error"' not in html
+    # Los errores de validación ya no van en un mensaje general arriba
+    assert "message-error" not in html
+
+
+def test_error_de_categoria_aparece_junto_al_campo(client):
+    html = client.post("/inventory/categories", data={"name": ""}).get_data(as_text=True)
+
+    assert 'id="name-error"' in html
+    assert "El nombre de la categoría es obligatorio." in html
+    assert "message-error" not in html
+
+
+def test_errores_de_proveedor_aparecen_en_cada_campo(client):
+    html = client.post("/supplier/new", data={
+        "supplier_type": "", "name": "", "email": "no-es-un-email",
+    }).get_data(as_text=True)
+
+    for campo in ("supplier_type", "name", "email"):
+        assert f'id="{campo}-error"' in html
+    assert "message-error" not in html
+
+
+def test_errores_de_registro_aparecen_en_cada_campo(app):
+    anonimo = app.test_client()
+    html = anonimo.post("/auth/register", data={
+        "name": "Ana", "email": "no-es-un-email", "password": "123", "confirmation": "999",
+    }).get_data(as_text=True)
+
+    assert 'id="email-error"' in html
+    assert 'id="password-error"' in html
+    assert 'id="name-error"' not in html

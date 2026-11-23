@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_forms.html" as forms %}
 
 {% block title %}Categorías · Gestor de Inventario{% endblock %}
 
@@ -11,8 +12,12 @@
 <div class="toolbar">
     {{ search_bar(url_for('inventory.categories'), q, "Buscar categoría") }}
     <form method="post" class="create-bar">
-        <input type="text" name="name" maxlength="60" value="{{ name }}" placeholder="Nueva categoría" aria-label="Nombre de la nueva categoría" required>
-        <button type="submit" class="button">Crear</button>
+        <input type="text" name="name" maxlength="60" value="{{ name }}" placeholder="Nombre de la categoría" aria-label="Nombre de la nueva categoría" required{{ forms.invalid(errors, "name") }}>
+        <button type="submit" class="button button-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Nueva categoría
+        </button>
+        {{ forms.error(errors, "name") }}
     </form>
 </div>
 

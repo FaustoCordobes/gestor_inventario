@@ -1,17 +1,26 @@
 :root {
-    --background: #f4f4f5;
+    /* Colores revisados con la fórmula de contraste de WCAG 2.1 (texto >= 4.5:1, campos y foco >= 3:1) */
+    /* Neutros cálidos: combinan con el naranja de la marca y el fondo se acerca al blanco */
+    --background: #f7f6f4;
     --white: #ffffff;
-    --border: #e6e6e8;
+    --border: #e0ded9;
+    --border-strong: #85827e; /* bordes de campos de formulario: 3.8:1 sobre blanco */
     --text: #1f1f22;
-    --text-muted: #6e6e76;
-    --orange: #ff6a13;
+    --text-muted: #625f5b; /* 6.4:1 sobre blanco, 5.9:1 sobre el fondo */
+    --orange: #ff6a13; /* solo para rellenos y decoración, no para texto sobre blanco */
+    --orange-text: #b93c0a; /* naranja para texto, íconos y foco: 5.6:1 sobre blanco */
     --orange-light: #fff1e8;
     --black: #1c1c1e;
-    --green: #1e9e5a;
+    --green: #157a43;
     --green-light: #e6f6ed;
-    --red: #d93a3a;
+    --red: #b92626;
     --red-light: #fdeceb;
     --radius: 12px;
+    --cell-y: 12px; /* relleno vertical de las celdas de tabla */
+    /* Animaciones: cortas y con una curva que arranca rápido y frena suave */
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+    --t-fast: 120ms;
+    --t: 180ms;
 }
 
 * {
@@ -20,7 +29,7 @@
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: "Manrope", "Segoe UI", Roboto, Arial, sans-serif;
     font-size: 15px;
     color: var(--text);
     background: var(--background);
@@ -28,8 +37,9 @@ body {
 }
 
 a {
-    color: var(--orange);
+    color: var(--orange-text);
     text-decoration: none;
+    transition: color var(--t-fast) var(--ease);
 }
 
 a:hover {
@@ -37,7 +47,7 @@ a:hover {
 }
 
 :focus-visible {
-    outline: 2px solid var(--orange);
+    outline: 2px solid var(--orange-text);
     outline-offset: 2px;
 }
 
@@ -72,20 +82,28 @@ h2 {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    /* 26px arriba: el centro del logo (34px) queda a 43px, a la misma altura que el título de la página */
+    padding: 26px 16px 24px;
     background: var(--white);
     border-right: 1px solid var(--border);
+}
+
+.sidebar .brand-icon {
+    width: 34px;
+    height: 34px;
 }
 
 .brand {
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
+    gap: 10px;
+    margin-bottom: 42px;
     color: var(--text);
-    font-size: 24px;
-    font-weight: 700;
+    /* El nombre de la aplicación es una marca discreta: el título de cada sección (28px) manda en la pantalla */
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .brand:hover {
@@ -132,6 +150,15 @@ h2 {
     padding: 12px;
     border-radius: 8px;
     color: var(--text);
+    transition: background-color var(--t-fast) var(--ease);
+}
+
+.menu a svg {
+    transition: transform var(--t) var(--ease);
+}
+
+.menu a:hover svg {
+    transform: scale(1.1);
 }
 
 .menu a:hover {
@@ -141,15 +168,15 @@ h2 {
 
 .menu a.active {
     font-weight: 600;
-    background: #ececee;
+    background: #ebe9e5;
 }
 
 .user {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-top: auto;
-    padding: 10px 12px;
+    padding: 10px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
 }
@@ -162,20 +189,37 @@ h2 {
     height: 34px;
     border-radius: 8px;
     font-weight: 700;
-    color: var(--orange);
+    color: var(--orange-text);
     background: var(--orange-light);
 }
 
+/* Mismo peso que los items del menú; si el nombre es largo pasa a dos líneas en vez de cortarse */
 .user-name {
     flex: 1;
+    min-width: 0;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .logout {
     display: inline-flex;
-    color: var(--orange);
+    color: var(--orange-text);
+}
+
+.logout svg {
+    transition: transform var(--t) var(--ease);
+}
+
+.logout:hover svg {
+    transform: translateX(3px);
 }
 
 .main {
@@ -183,8 +227,9 @@ h2 {
     min-width: 0;
 }
 
+/* 21px arriba: así la línea del título (cabecera de 44px) queda a la misma altura que el logo de la barra lateral */
 .content {
-    padding: 32px;
+    padding: 21px 32px 32px;
 }
 
 .page-title {
@@ -196,10 +241,19 @@ h2 {
 
 .card {
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+}
+
+/* El relleno de la tarjeta es el único espacio hasta el contenido: sin márgenes extra del primero ni del último elemento */
+.card > :first-child {
+    margin-top: 0;
+}
+
+.card > :last-child {
+    margin-bottom: 0;
 }
 
 .text-muted {
@@ -219,15 +273,37 @@ h2 {
     border-radius: 8px;
     cursor: pointer;
     white-space: nowrap;
+    transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 
 .button:hover {
     text-decoration: none;
     background: #333336;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+/* Botón con ícono a la izquierda del texto (agregar producto, proveedor y categoría) */
+.button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.button-icon svg {
+    flex-shrink: 0;
+    transition: transform var(--t) var(--ease);
+}
+
+/* El "+" gira un cuarto de vuelta al pasar el mouse */
+.button-icon:hover svg {
+    transform: rotate(90deg);
 }
 
 .button:active {
-    transform: translateY(1px);
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
 }
 
 .button:disabled,
@@ -235,14 +311,17 @@ h2 {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
+/* Texto oscuro sobre el naranja de marca: 5.9:1 (el blanco daba solo 2.9:1) */
 .button-orange {
+    color: var(--black);
     background: var(--orange);
 }
 
 .button-orange:hover {
-    background: #e85c0a;
+    background: #ff8240;
 }
 
 .button-wide {
@@ -263,12 +342,18 @@ h2 {
     font-weight: 600;
 }
 
+/* La primera fila del formulario no suma margen: el relleno de la tarjeta (24px) ya separa */
+.card > .form > :first-child label,
+.card > .form > label:first-child {
+    margin-top: 0;
+}
+
 .form input,
 .form select,
 .form textarea {
     padding: 10px 12px;
     font: inherit;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
 }
 
@@ -276,7 +361,8 @@ h2 {
 .form select:focus,
 .form textarea:focus {
     outline: none;
-    border-color: var(--orange);
+    border-color: var(--orange-text);
+    box-shadow: 0 0 0 1px var(--orange-text);
 }
 
 .form input:user-invalid,
@@ -294,6 +380,31 @@ h2 {
 .form input:not([type="checkbox"]),
 .form select {
     height: 44px;
+}
+
+/* Campo con error: borde rojo y el mensaje debajo, con ícono (el color solo no alcanza para comunicarlo) */
+.form input[aria-invalid="true"],
+.form select[aria-invalid="true"],
+.form textarea[aria-invalid="true"],
+.create-bar input[aria-invalid="true"] {
+    border-color: var(--red);
+    box-shadow: 0 0 0 1px var(--red);
+}
+
+.field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--red);
+}
+
+.field-error svg {
+    flex-shrink: 0;
+    margin-top: 1px;
 }
 
 .form input[type="checkbox"] {
@@ -315,7 +426,7 @@ h2 {
 .message {
     padding: 12px 16px;
     border-radius: 8px;
-    background: #ececee;
+    background: #ebe9e5;
 }
 
 .message-exito {
@@ -364,7 +475,7 @@ h2 {
     margin: 0;
     font-size: 56px;
     font-weight: 700;
-    color: var(--orange);
+    color: var(--orange-text);
 }
 
 .error-page .button {
@@ -378,9 +489,43 @@ table {
 
 th,
 td {
-    padding: 12px;
+    padding: var(--cell-y) 10px;
     text-align: left;
     border-bottom: 1px solid var(--border);
+}
+
+/* El texto de la primera y la última columna se alinea con el relleno de la tarjeta (igual que el título) */
+th:first-child,
+td:first-child {
+    padding-left: 0;
+}
+
+th:last-child,
+td:last-child {
+    padding-right: 0;
+}
+
+/* El relleno de las celdas ya separa el texto del borde de la fila: dentro de una tarjeta se descuenta para que
+   el texto de la tabla quede a la misma distancia del borde que cualquier otro contenido (24px) */
+.card > .table-scroll {
+    margin-block: calc(var(--cell-y) * -1);
+}
+
+.table-scroll tbody tr:last-child > td {
+    border-bottom: none;
+}
+
+@media (min-width: 961px) {
+    .card.card-table > table,
+    .card > table.table-detail {
+        margin-block: calc(var(--cell-y) * -1);
+    }
+
+    .card-table tbody tr:last-child > td,
+    .table-detail tbody tr:last-child > th,
+    .table-detail tbody tr:last-child > td {
+        border-bottom: none;
+    }
 }
 
 th {
@@ -411,11 +556,18 @@ th {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    /* Alto del botón: así la cabecera mide lo mismo con o sin botón. */
+    min-height: 44px;
     margin-bottom: 24px;
 }
 
 .page-header .page-title {
     margin: 0;
+}
+
+/* Los botones de la cabecera no llevan el margen superior de los botones de formulario */
+.page-header > .form-buttons {
+    margin-top: 0;
 }
 
 /* Barra de búsqueda común a todas las listas (ver templates/_search.html) */
@@ -448,7 +600,7 @@ th {
     padding: 0 12px 0 40px;
     font: inherit;
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
 }
 
@@ -457,23 +609,24 @@ th {
     padding: 0 12px;
     font: inherit;
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
 }
 
 .search-field input:focus,
 .search-bar select:focus {
     outline: none;
-    border-color: var(--orange);
+    border-color: var(--orange-text);
+    box-shadow: 0 0 0 1px var(--orange-text);
 }
 
 .button-light {
     color: var(--text);
-    background: #ececee;
+    background: #ebe9e5;
 }
 
 .button-light:hover {
-    background: #e0e0e3;
+    background: #e0ded9;
 }
 
 .button-danger {
@@ -481,7 +634,7 @@ th {
 }
 
 .button-danger:hover {
-    background: #c22f2f;
+    background: #9f1f1f;
 }
 
 .actions {
@@ -494,6 +647,25 @@ th {
 
 .actions form {
     margin: 0;
+}
+
+/* En escritorio la celda de acciones sigue siendo una celda de tabla: con display:flex
+   se salía del layout de la tabla y la línea de la fila quedaba desalineada. */
+@media (min-width: 961px) {
+    td.actions {
+        display: table-cell;
+        text-align: right;
+    }
+
+    td.actions > * {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /* 12px + el espacio en blanco entre enlaces (~4px) = 16px, como antes */
+    td.actions > * + * {
+        margin-left: 12px;
+    }
 }
 
 .link-danger {
@@ -514,6 +686,40 @@ th {
 
 .card-form {
     max-width: 720px;
+}
+
+/* Formularios de alta/edición: la tarjeta se estira hasta el borde inferior de la pantalla */
+.main {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+}
+
+.content:has(> .card-fill) {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-fill {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* El espacio que sobra se reparte entre los grupos de campos; el pie (aviso y botones) queda abajo */
+.card-fill > .form {
+    flex: 1;
+    justify-content: space-between;
+}
+
+.field,
+.form-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .separated {
@@ -540,6 +746,7 @@ th {
 .toolbar {
     display: grid;
     grid-template-columns: 1fr auto;
+    align-items: start; /* si aparece un error bajo "Nueva categoría", el buscador no se corre */
     gap: 16px;
     margin-bottom: 24px;
 }
@@ -550,8 +757,19 @@ th {
 
 .create-bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 12px;
+}
+
+/* El error del campo va en su propia línea, debajo del campo y el botón.
+   width: 0 + min-width: 100% evita que un mensaje largo ensanche la barra y apriete el buscador. */
+.create-bar .field-error {
+    flex: 1 1 100%;
+    width: 0;
+    min-width: 100%;
+    max-width: 100%;
+    margin-right: -12px; /* descuenta el espacio entre elementos que el mensaje sumaría al ancho natural de la barra */
 }
 
 .create-bar input {
@@ -562,13 +780,21 @@ th {
     padding: 0 12px;
     font: inherit;
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
 }
 
 .create-bar input:focus {
     outline: none;
-    border-color: var(--orange);
+    border-color: var(--orange-text);
+    box-shadow: 0 0 0 1px var(--orange-text);
+}
+
+/* Con error, el borde sigue rojo aunque el campo tenga el foco */
+.create-bar input[aria-invalid="true"],
+.create-bar input[aria-invalid="true"]:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 1px var(--red);
 }
 
 .form-note {
@@ -582,11 +808,22 @@ th {
     margin-top: 12px;
 }
 
+/* Un solo espacio entre tarjetas, tanto al costado como arriba y abajo (24px, igual que el relleno de la tarjeta) */
 .metrics,
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-    gap: 16px;
+    gap: 24px;
+}
+
+/* Métricas: 2 columnas, y 4 solo cuando entran. Así nunca queda una tarjeta sola en la última fila */
+.metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1200px) {
+    .metrics {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .dashboard-grid {
@@ -599,18 +836,16 @@ th {
     min-width: 0;
 }
 
+/* La etiqueta arriba y la cifra abajo: las cifras quedan alineadas entre tarjetas sin reservar un alto fijo */
 .metric {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: 8px;
 }
 
 .metric strong {
     font-size: 24px;
-}
-
-.metric > span:first-child {
-    min-height: 40px;
 }
 
 .dashboard-grid .card h2,
@@ -688,7 +923,7 @@ th {
     .topbar .brand {
         flex: 1;
         margin: 0;
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .topbar .brand-icon {
@@ -699,6 +934,12 @@ th {
     .app {
         display: block;
         min-height: 0;
+    }
+
+    /* Alto de la pantalla menos la barra superior (65px), para que las tarjetas de formulario lleguen abajo */
+    .main {
+        min-height: calc(100vh - 65px - env(safe-area-inset-top));
+        min-height: calc(100dvh - 65px - env(safe-area-inset-top));
     }
 
     .sidebar {
@@ -813,7 +1054,7 @@ th {
         background: var(--white);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .table-stack td {
@@ -889,7 +1130,12 @@ th {
         border-bottom: 1px solid var(--border);
     }
 
+    .table-detail tr:first-child {
+        padding-top: 0;
+    }
+
     .table-detail tr:last-child {
+        padding-bottom: 0;
         border-bottom: none;
     }
 
@@ -1004,12 +1250,19 @@ th {
         flex: 1 1 0;
     }
 
+    /* El botón "Nueva categoría" es más largo que el antiguo "Crear": en celular el campo y el botón van uno debajo del otro */
     .create-bar {
+        flex-wrap: wrap;
         gap: 8px;
     }
 
     .create-bar input {
+        flex: 1 1 100%;
         width: auto;
+    }
+
+    .create-bar .button {
+        flex: 1 1 100%;
     }
 
     .toolbar {
@@ -1025,11 +1278,9 @@ th {
 
     .metric {
         gap: 4px;
-        padding: 14px;
     }
 
     .metric > span:first-child {
-        min-height: 0;
         font-size: 13px;
     }
 
@@ -1047,9 +1298,13 @@ th {
         margin-top: 12px;
     }
 
+    :root {
+        --cell-y: 10px;
+    }
+
     th,
     td {
-        padding: 10px 8px;
+        padding: var(--cell-y) 8px;
     }
 
     th:first-child,
@@ -1086,8 +1341,72 @@ th {
     }
 }
 
+/* ---------- Animaciones ----------
+   Cortas (120 a 220 ms) y solo con transform, opacity y colores, que son las propiedades baratas de animar. */
+
+/* Campos: el borde y el aro de foco aparecen suavemente */
+.form input,
+.form select,
+.form textarea,
+.search-field input,
+.search-bar select,
+.create-bar input {
+    transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.icon-button {
+    transition: background-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.icon-button:active {
+    transform: scale(0.94);
+}
+
+/* Filas de tabla: se resaltan al pasar el mouse (solo en dispositivos con mouse) */
+@media (hover: hover) and (min-width: 961px) {
+    .card-table tbody tr,
+    .table-scroll tbody tr {
+        transition: background-color var(--t-fast) var(--ease);
+    }
+
+    .card-table tbody tr:hover,
+    .table-scroll tbody tr:hover {
+        background: var(--background);
+    }
+}
+
+/* Mensajes (éxito y error) y errores de campo: aparecen suavemente desde arriba */
+@keyframes message-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.message,
+.field-error {
+    animation: message-in 0.2s var(--ease) backwards;
+}
+
+/* Quien prefiere menos movimiento no ve animaciones */
 @media (prefers-reduced-motion: reduce) {
-    .sidebar {
-        transition: none;
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .button:hover,
+    .button-icon:hover svg,
+    .menu a:hover svg,
+    .logout:hover svg {
+        transform: none;
     }
 }

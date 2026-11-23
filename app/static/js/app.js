@@ -1,7 +1,15 @@
 // Foco automático solo con mouse: en pantallas táctiles abriría el teclado
 // o el selector nativo apenas carga la página y taparía el formulario.
+// Si el formulario volvió con errores, el foco va al primer campo con error.
 (function () {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
+    var invalid = document.querySelector('[aria-invalid="true"]');
+    var pointerFine = window.matchMedia("(pointer: fine)").matches;
+    if (invalid) {
+        if (pointerFine) invalid.focus();
+        else invalid.scrollIntoView({ block: "center" });
+        return;
+    }
+    if (!pointerFine) return;
     var field = document.querySelector("[data-autofocus]");
     if (field) field.focus();
 })();

@@ -30,21 +30,30 @@ def register():
         password = request.form.get("password", "")
         confirmation = request.form.get("confirmation", "")
 
-        if not name or not email or not password:
-            flash("Completá todos los campos.", "error")
+        # Cada error se guarda con el nombre de su campo para mostrarlo debajo de él.
+        errors = {}
+        if not name:
+            errors["name"] = "Completá tu nombre."
         elif len(name) > 80:
-            flash("El nombre puede tener hasta 80 caracteres.", "error")
+            errors["name"] = "El nombre puede tener hasta 80 caracteres."
+
+        if not email:
+            errors["email"] = "Completá tu email."
         elif len(email) > 120 or not EMAIL_PATTERN.fullmatch(email):
-            flash("El email no es válido.", "error")
-        elif len(password) < 6:
-            flash("La contraseña tiene que tener al menos 6 caracteres.", "error")
-        elif len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
-            flash("La contraseña es demasiado larga (máximo 72 caracteres).", "error")
-        elif password != confirmation:
-            flash("Las contraseñas no coinciden.", "error")
+            errors["email"] = "El email no es válido."
         elif User.query.filter_by(email=email).first():
-            flash("Ya existe una cuenta con ese email.", "error")
-        else:
+            errors["email"] = "Ya existe una cuenta con ese email."
+
+        if not password:
+            errors["password"] = "Completá tu contraseña."
+        elif len(password) < 6:
+            errors["password"] = "La contraseña tiene que tener al menos 6 caracteres."
+        elif len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
+            errors["password"] = "La contraseña es demasiado larga (máximo 72 caracteres)."
+        elif password != confirmation:
+            errors["confirmation"] = "Las contraseñas no coinciden."
+
+        if not errors:
             password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
             user = User(name=name, email=email, password_hash=password_hash)
             try:
@@ -57,9 +66,9 @@ def register():
                 flash("Cuenta creada. Ya podés iniciar sesión.", "exito")
                 return redirect(url_for("auth.login"))
 
-        return render_template("auth/register.html", name=name, email=email)
+        return render_template("auth/register.html", name=name, email=email, errors=errors)
 
-    return render_template("auth/register.html")
+    return render_template("auth/register.html", errors={})
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])

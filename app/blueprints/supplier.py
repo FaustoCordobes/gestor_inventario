@@ -69,24 +69,28 @@ def _name_taken(column, value, supplier_id=None):
 
 
 def _validate_supplier(data, supplier_id=None):
-    errors = []
+    """Devuelve un diccionario campo -> mensaje (si un campo tiene varios problemas, el primero)."""
+    errors = {}
+
+    def add_error(field, message):
+        errors.setdefault(field, message)
 
     if data["supplier_type"] not in SUPPLIER_TYPES:
-        errors.append("Elegí un tipo de proveedor válido.")
+        add_error("supplier_type", "Elegí un tipo de proveedor válido.")
     if not data["name"]:
-        errors.append("El nombre es obligatorio.")
+        add_error("name", "El nombre es obligatorio.")
     elif _name_taken(Supplier.name, data["name"], supplier_id):
-        errors.append("Ya existe un proveedor con ese nombre.")
+        add_error("name", "Ya existe un proveedor con ese nombre.")
     if data["email"] and not EMAIL_PATTERN.fullmatch(data["email"]):
-        errors.append("El email no es válido.")
+        add_error("email", "El email no es válido.")
     if data["phone"]:
         digits = sum(ch.isdigit() for ch in data["phone"])
         if not PHONE_PATTERN.fullmatch(data["phone"]) or digits < 6:
-            errors.append("El teléfono solo puede tener números, espacios, +, -, ( ) y punto (mínimo 6 dígitos).")
+            add_error("phone", "El teléfono solo puede tener números, espacios, +, -, ( ) y punto (mínimo 6 dígitos).")
 
     for field, (label, maximum) in MAX_LENGTHS.items():
         if len(data[field]) > maximum:
-            errors.append(f"{label} puede tener hasta {maximum} caracteres.")
+            add_error(field, f"{label} puede tener hasta {maximum} caracteres.")
 
     return errors
 
@@ -134,16 +138,14 @@ def new():
         data = _read_form()
         errors = _validate_supplier(data)
         if errors:
-            for error in errors:
-                flash(error, "error")
-            return render_template("supplier/create.html", supplier=None, data=data)
+            return render_template("supplier/create.html", supplier=None, data=data, errors=errors)
 
         if _save(Supplier(), data):
             flash("Proveedor creado.", "exito")
             return redirect(url_for("supplier.index"))
-        return render_template("supplier/create.html", supplier=None, data=data)
+        return render_template("supplier/create.html", supplier=None, data=data, errors={})
 
-    return render_template("supplier/create.html", supplier=None, data=_empty_form_data())
+    return render_template("supplier/create.html", supplier=None, data=_empty_form_data(), errors={})
 
 
 @supplier_bp.route("/<int:supplier_id>")
@@ -162,16 +164,16 @@ def edit(supplier_id):
         data = _read_form()
         errors = _validate_supplier(data, supplier_id=supplier.id)
         if errors:
-            for error in errors:
-                flash(error, "error")
-            return render_template("supplier/create.html", supplier=supplier, data=data)
+            return render_template("supplier/create.html", supplier=supplier, data=data, errors=errors)
 
         if _save(supplier, data):
             flash("Proveedor actualizado.", "exito")
             return redirect(url_for("supplier.detail", supplier_id=supplier.id))
-        return render_template("supplier/create.html", supplier=supplier, data=data)
+        return render_template("supplier/create.html", supplier=supplier, data=data, errors={})
 
-    return render_template("supplier/create.html", supplier=supplier, data=_supplier_form_data(supplier))
+    return render_template(
+        "supplier/create.html", supplier=supplier, data=_supplier_form_data(supplier), errors={}
+    )
 
 
 @supplier_bp.route("/<int:supplier_id>/delete", methods=["GET", "POST"])

@@ -7,7 +7,7 @@ from app.models import Product, Supplier
 
 @mcp.tool()
 def dashboard_summary() -> dict:
-    """Resumen del dashboard: total de productos, productos con stock bajo, valor del inventario a costo y proveedores activos."""
+    """Resumen de las analíticas: total de productos, productos con stock bajo, valor del inventario a costo y proveedores activos."""
     with flask_app.app_context():
         inventory_value = db.session.query(func.sum(Product.cost * Product.stock)).scalar() or 0
         return {

@@ -1,21 +1,25 @@
 {% extends "base.html" %}
+{% import "_forms.html" as forms %}
 
 {% block title %}{{ 'Editar proveedor' if supplier else 'Nuevo proveedor' }} · Gestor de Inventario{% endblock %}
 
 {% block content %}
-<h1 class="page-title">{{ 'Editar proveedor' if supplier else 'Nuevo proveedor' }}</h1>
+<div class="page-header">
+    <h1 class="page-title">{{ 'Editar proveedor' if supplier else 'Nuevo proveedor' }}</h1>
+</div>
 
-<div class="card card-form">
+<div class="card card-form card-fill">
     <form method="post" class="form form-no-margin" novalidate>
         <div class="row-double">
             <div>
                 <label for="supplier_type">Tipo de proveedor *</label>
-                <select id="supplier_type" name="supplier_type" required data-autofocus>
+                <select id="supplier_type" name="supplier_type" required data-autofocus{{ forms.invalid(errors, "supplier_type") }}>
                     <option value="" disabled {{ 'selected' if not data.supplier_type }}>Elegí un tipo</option>
                     {% for t in supplier_types %}
                     <option value="{{ t }}" {{ 'selected' if data.supplier_type == t }}>{{ t }}</option>
                     {% endfor %}
                 </select>
+                {{ forms.error(errors, "supplier_type") }}
             </div>
             <div>
                 <label for="is_active">Activo</label>
@@ -26,36 +30,47 @@
         <div class="row-double">
             <div>
                 <label for="name">Nombre *</label>
-                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" placeholder="Ej: Sportline Distribution" required>
+                <input type="text" id="name" name="name" maxlength="100" value="{{ data.name }}" placeholder="Ej: Sportline Distribution" required{{ forms.invalid(errors, "name") }}>
+                {{ forms.error(errors, "name") }}
             </div>
             <div>
                 <label for="contact_name">Persona de contacto</label>
-                <input type="text" id="contact_name" name="contact_name" maxlength="100" value="{{ data.contact_name }}" placeholder="Ej: Juan Pérez">
+                <input type="text" id="contact_name" name="contact_name" maxlength="100" value="{{ data.contact_name }}" placeholder="Ej: Juan Pérez"{{ forms.invalid(errors, "contact_name") }}>
+                {{ forms.error(errors, "contact_name") }}
             </div>
         </div>
 
         <div class="row-double">
             <div>
                 <label for="phone">Teléfono</label>
-                <input type="text" id="phone" name="phone" maxlength="30" value="{{ data.phone }}" placeholder="Ej: +54 11 4555-1001">
+                <input type="text" id="phone" name="phone" maxlength="30" value="{{ data.phone }}" placeholder="Ej: +54 11 4555-1001"{{ forms.invalid(errors, "phone") }}>
+                {{ forms.error(errors, "phone") }}
             </div>
             <div>
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" maxlength="120" value="{{ data.email }}" placeholder="Ej: ventas@proveedor.com">
+                <input type="email" id="email" name="email" maxlength="120" value="{{ data.email }}" placeholder="Ej: ventas@proveedor.com"{{ forms.invalid(errors, "email") }}>
+                {{ forms.error(errors, "email") }}
             </div>
         </div>
 
-        <label for="address">Dirección</label>
-        <input type="text" id="address" name="address" maxlength="150" value="{{ data.address }}" placeholder="Ej: Av. Corrientes 1200, Buenos Aires">
+        <div class="field">
+            <label for="address">Dirección</label>
+            <input type="text" id="address" name="address" maxlength="150" value="{{ data.address }}" placeholder="Ej: Av. Corrientes 1200, Buenos Aires"{{ forms.invalid(errors, "address") }}>
+            {{ forms.error(errors, "address") }}
+        </div>
 
-        <label for="description">Descripción</label>
-        <textarea id="description" name="description" rows="3" placeholder="Ej: Ropa deportiva para running">{{ data.description }}</textarea>
+        <div class="field">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="3" placeholder="Ej: Ropa deportiva para running">{{ data.description }}</textarea>
+        </div>
 
-        <p class="text-muted form-note">Los campos con * son obligatorios.</p>
+        <div class="form-footer">
+            <p class="text-muted form-note">Los campos con * son obligatorios.</p>
 
-        <div class="form-buttons">
-            <button type="submit" class="button">{{ 'Guardar cambios' if supplier else 'Crear proveedor' }}</button>
-            <a class="button button-light" href="{{ url_for('supplier.detail', supplier_id=supplier.id) if supplier else url_for('supplier.index') }}">Cancelar</a>
+            <div class="form-buttons">
+                <button type="submit" class="button">{{ 'Guardar cambios' if supplier else 'Crear proveedor' }}</button>
+                <a class="button button-light" href="{{ url_for('supplier.detail', supplier_id=supplier.id) if supplier else url_for('supplier.index') }}">Cancelar</a>
+            </div>
         </div>
     </form>
 </div>

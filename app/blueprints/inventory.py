@@ -79,28 +79,32 @@ def _read_form():
 def _validate_product(data, product_id=None):
     """Valida los datos del formulario.
 
-    Devuelve (errores, limpios): una lista de mensajes y un diccionario con
-    los valores ya convertidos a su tipo final.
+    Devuelve (errores, limpios): un diccionario campo -> mensaje (para mostrar cada
+    error debajo de su campo) y otro con los valores ya convertidos a su tipo final.
+    Si un campo tiene varios problemas, se informa el primero.
     """
-    errors = []
+    errors = {}
     clean = {}
+
+    def add_error(field, message):
+        errors.setdefault(field, message)
 
     # Campos vacíos
     required_fields = {
-        "code": "El código",
-        "name": "El nombre",
-        "price": "El precio",
-        "stock": "El stock",
-        "category_id": "La categoría",
+        "code": "El código es obligatorio.",
+        "name": "El nombre es obligatorio.",
+        "price": "El precio es obligatorio.",
+        "stock": "El stock es obligatorio.",
+        "category_id": "La categoría es obligatoria.",
     }
-    for field, label in required_fields.items():
+    for field, message in required_fields.items():
         if not data[field]:
-            errors.append(f"{label} es obligatorio.")
+            add_error(field, message)
 
     if len(data["code"]) > 20:
-        errors.append("El código puede tener hasta 20 caracteres.")
+        add_error("code", "El código puede tener hasta 20 caracteres.")
     if len(data["name"]) > 100:
-        errors.append("El nombre puede tener hasta 100 caracteres.")
+        add_error("name", "El nombre puede tener hasta 100 caracteres.")
 
     # Números: tienen que ser números, no negativos y no pasarse de un máximo
     numeric_fields = [
@@ -119,14 +123,15 @@ def _validate_product(data, product_id=None):
         value = _to_number(text, integer=integer)
         if value is None:
             kind = "un número entero" if integer else "un número"
-            errors.append(f"{label} tiene que ser {kind}.")
+            add_error(field, f"{label} tiene que ser {kind}.")
         elif value < 0:
-            errors.append(f"{label} no puede ser negativo.")
+            add_error(field, f"{label} no puede ser negativo.")
         elif value > maximum:
-            errors.append(f"{label} no puede ser mayor a {maximum:,}.".replace(",", "."))
+            add_error(field, f"{label} no puede ser mayor a {maximum:,}.".replace(",", "."))
         elif not integer and re.search(r"[.,]\d{3,}$", text):
-            errors.append(
-                f"{label} puede tener hasta 2 decimales (no uses puntos para separar los miles)."
+            add_error(
+                field,
+                f"{label} puede tener hasta 2 decimales (no uses puntos para separar los miles).",
             )
         else:
             clean[field] = value
@@ -138,7 +143,7 @@ def _validate_product(data, product_id=None):
         if category_id is not None:
             category = db.session.get(Category, category_id)
         if category is None:
-            errors.append("Elegí una categoría de la lista.")
+            add_error("category_id", "Elegí una categoría de la lista.")
     clean["category_id"] = category.id if category else None
 
     supplier_id = None
@@ -148,7 +153,7 @@ def _validate_product(data, product_id=None):
         if parsed_id is not None:
             supplier = db.session.get(Supplier, parsed_id)
         if supplier is None:
-            errors.append("Elegí un proveedor de la lista.")
+            add_error("supplier_id", "Elegí un proveedor de la lista.")
         else:
             supplier_id = supplier.id
     clean["supplier_id"] = supplier_id
@@ -159,13 +164,13 @@ def _validate_product(data, product_id=None):
         if product_id:
             query = query.filter(Product.id != product_id)
         if query.first():
-            errors.append("Ya existe un producto con ese código.")
+            add_error("code", "Ya existe un producto con ese código.")
     if data["name"]:
         query = Product.query.filter(func.lower(Product.name) == data["name"].lower())
         if product_id:
             query = query.filter(Product.id != product_id)
         if query.first():
-            errors.append("Ya existe un producto con ese nombre.")
+            add_error("name", "Ya existe un producto con ese nombre.")
 
     clean["code"] = data["code"]
     clean["name"] = data["name"]
@@ -195,7 +200,7 @@ def _empty_form_data():
     }
 
 
-def _render_form(product, data):
+def _render_form(product, data, errors=None):
     # Se listan los proveedores activos y, si el producto ya tiene uno inactivo,
     # también ese: si no, al guardar se le sacaría el proveedor sin avisar.
     current_id = _parse_id(data.get("supplier_id", ""))
@@ -209,6 +214,7 @@ def _render_form(product, data):
         "inventory/form.html",
         product=product,
         data=data,
+        errors=errors or {},
         categories=Category.query.order_by(Category.name).all(),
         suppliers=suppliers,
     )
@@ -274,9 +280,7 @@ def new():
         data = _read_form()
         errors, clean = _validate_product(data)
         if errors:
-            for error in errors:
-                flash(error, "error")
-            return _render_form(None, data)
+            return _render_form(None, data, errors)
 
         if _save(Product(), clean):
             flash("Producto creado.", "exito")
@@ -295,9 +299,7 @@ def edit(product_id):
         data = _read_form()
         errors, clean = _validate_product(data, product_id=product.id)
         if errors:
-            for error in errors:
-                flash(error, "error")
-            return _render_form(product, data)
+            return _render_form(product, data, errors)
 
         if _save(product, clean):
             flash("Producto actualizado.", "exito")
@@ -335,22 +337,23 @@ def delete(product_id):
 @login_required
 def categories():
     name = ""
+    errors = {}
     if request.method == "POST":
         name = request.form.get("name", "").strip()
 
         if not name:
-            flash("El nombre de la categoría es obligatorio.", "error")
+            errors["name"] = "El nombre de la categoría es obligatorio."
         elif len(name) > 60:
-            flash("El nombre puede tener hasta 60 caracteres.", "error")
+            errors["name"] = "El nombre puede tener hasta 60 caracteres."
         elif Category.query.filter(func.lower(Category.name) == name.lower()).first():
-            flash("Ya existe una categoría con ese nombre.", "error")
+            errors["name"] = "Ya existe una categoría con ese nombre."
         else:
             try:
                 db.session.add(Category(name=name))
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-                flash("Ya existe una categoría con ese nombre.", "error")
+                errors["name"] = "Ya existe una categoría con ese nombre."
             except Exception:
                 db.session.rollback()
                 flash("No se pudo crear la categoría. Probá de nuevo.", "error")
@@ -363,7 +366,9 @@ def categories():
     if q:
         query = query.filter(Category.name.icontains(q, autoescape=True))
     all_categories = query.order_by(Category.name).all()
-    return render_template("inventory/categories.html", categories=all_categories, name=name, q=q)
+    return render_template(
+        "inventory/categories.html", categories=all_categories, name=name, q=q, errors=errors
+    )
 
 
 @inventory_bp.route("/categories/<int:category_id>/delete", methods=["POST"])
