@@ -1,3 +1,5 @@
+import re
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
@@ -5,6 +7,10 @@ from app.extensions import bcrypt, db, login_manager
 from app.models import User
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+EMAIL_PATTERN = re.compile(r"[^@\s]+@[^@\s]+\.[^@\s]+")
+# bcrypt solo usa los primeros 72 bytes; las versiones nuevas fallan si se pasa de ahí.
+MAX_PASSWORD_BYTES = 72
 
 
 @login_manager.user_loader
@@ -25,8 +31,14 @@ def register():
 
         if not name or not email or not password:
             flash("Completá todos los campos.", "error")
+        elif len(name) > 80:
+            flash("El nombre puede tener hasta 80 caracteres.", "error")
+        elif len(email) > 120 or not EMAIL_PATTERN.fullmatch(email):
+            flash("El email no es válido.", "error")
         elif len(password) < 6:
             flash("La contraseña tiene que tener al menos 6 caracteres.", "error")
+        elif len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
+            flash("La contraseña es demasiado larga (máximo 72 caracteres).", "error")
         elif password != confirmation:
             flash("Las contraseñas no coinciden.", "error")
         elif User.query.filter_by(email=email).first():
@@ -59,7 +71,14 @@ def login():
         password = request.form.get("password", "")
         user = User.query.filter_by(email=email).first()
 
-        if user and bcrypt.check_password_hash(user.password_hash, password):
+        password_ok = False
+        if user and len(password.encode("utf-8")) <= MAX_PASSWORD_BYTES:
+            try:
+                password_ok = bcrypt.check_password_hash(user.password_hash, password)
+            except ValueError:
+                password_ok = False
+
+        if password_ok:
             login_user(user)
             return redirect(url_for("dashboard.index"))
 
